@@ -32,10 +32,10 @@ app.use(
 				value.trim(),
 			);
 			if (configuredOrigins.includes(origin)) return origin;
-				if (
+			if (
 					env.NODE_ENV !== "production" &&
 					/^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(origin)
-				) {
+			) {
 				return origin;
 			}
 			return undefined;

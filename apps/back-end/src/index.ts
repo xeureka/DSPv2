@@ -1,7 +1,6 @@
 import { serve } from "@hono/node-server";
 import app from "./app";
 import "./lib/env";
-import { checkDatabaseConnection } from "./db/health";
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
 const hostname = "0.0.0.0";
@@ -53,21 +52,6 @@ async function main() {
 		}
 		logFatalError("Server error:", err);
 	});
-
-	// Listen immediately so the frontend gets a real API response instead of
-	// ECONNREFUSED while a remote database connection is warming up. Schema
-	// migration is deliberately run once after connectivity is confirmed;
-	// running it both here and below creates competing pool work on Neon.
-	void checkDatabaseConnection()
-		.then(async () => {
-			console.log("Database connection established");
-		})
-		.catch((error) => {
-			console.error(
-				"Database is unavailable; API will remain online and retry on restart:",
-				error,
-			);
-		});
 
 	process.on("SIGTERM", () => {
 		server.close(() => process.exit(0));

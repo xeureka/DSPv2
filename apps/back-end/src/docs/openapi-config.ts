@@ -6,8 +6,8 @@ export const setupOpenAPI = (app: OpenAPIHono) => {
 		openapi: "3.1.0",
 		info: {
 			version: "1.0.0",
-			title: "DSPV2 API",
-			description: "API documentation for the DSPv2 system",
+			title: "DispatchPilot API",
+			description: "API documentation for DispatchPilot",
 		},
 	});
 
@@ -15,7 +15,7 @@ export const setupOpenAPI = (app: OpenAPIHono) => {
 		"/docs",
 		apiReference({
 			theme: "purple",
-			pageTitle: "DSPv2 API Documentation",
+			pageTitle: "DispatchPilot API Documentation",
 			spec: {
 				url: "/openapi.json",
 			},
