@@ -71,3 +71,10 @@ docs/                PRD, implementation plan and SRS
 
 See [PRD](docs/PRD.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md),
 and [SRS v2](docs/DispatchPilot_SRS_REVISED.pdf) for planned product scope.
+
+## UI verification
+
+The dashboard and login layouts are responsive and include light/dark theme
+tokens, but screenshot verification is not recorded in this environment: no
+browser or screenshot runner was available, and the referenced
+`docs/design/reference-dashboard.png` file was not present.

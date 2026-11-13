@@ -4,7 +4,7 @@
 		"target": "es2023",
 		"lib": ["ES2023", "DOM"],
 		"module": "esnext",
-		"types": ["vite/client"],
+		"types": ["vite/client", "node"],
 		"allowArbitraryExtensions": true,
 		"skipLibCheck": true,
 
@@ -19,7 +19,7 @@
 		/* Path aliases */
 		"paths": {
 			"@/*": ["./src/*"],
-		"@dspv2/shared": ["../../packages/shared/src/index.ts"]
+			"@dspv2/shared": ["../../packages/shared/src/index.ts"]
 		},
 
 		/* Linting */
