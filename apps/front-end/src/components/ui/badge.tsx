@@ -1,5 +1,14 @@
-import { type BadgeTone, badgeTones } from "../../lib/status.ts";
 import { cn } from "../../lib/utils.ts";
+
+export type BadgeTone = "neutral" | "accent" | "success" | "warning" | "danger";
+
+const badgeTones: Record<BadgeTone, { chip: string; dot: string }> = {
+	neutral: { chip: "border-slate-200 bg-slate-50 text-slate-600", dot: "bg-slate-400" },
+	accent: { chip: "border-primary-200 bg-primary-50 text-primary-700", dot: "bg-primary-500" },
+	success: { chip: "border-emerald-200 bg-emerald-50 text-emerald-700", dot: "bg-emerald-500" },
+	warning: { chip: "border-amber-200 bg-amber-50 text-amber-700", dot: "bg-amber-500" },
+	danger: { chip: "border-rose-200 bg-rose-50 text-rose-700", dot: "bg-rose-500" },
+};
 
 export function Badge({
 	tone = "neutral",
@@ -10,10 +19,7 @@ export function Badge({
 	children: React.ReactNode;
 	className?: string;
 }) {
-	// API data can contain a newly introduced status before the frontend map is
-	// updated. Keep navigation/rendering alive and show a neutral badge rather
-	// than throwing while reading an undefined palette.
-	const palette = badgeTones[tone] ?? badgeTones.neutral;
+	const palette = badgeTones[tone];
 	return (
 		<span
 			className={cn(

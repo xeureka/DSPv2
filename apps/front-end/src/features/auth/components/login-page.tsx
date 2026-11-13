@@ -89,22 +89,16 @@ export function LoginPage() {
 
 	if (session) {
 		return (
-			<Navigate
-				to={session.user.isSuperAdmin ? "/platform-dashboard" : "/dashboard"}
-				replace
-			/>
+			<Navigate to="/" replace />
 		);
 	}
 
 	const onSubmit = async (values: FormValues) => {
 		setSubmitting(true);
 		try {
-			const session = await login(values.email, values.password);
+			await login(values.email, values.password);
 			toast.success("Welcome back");
-			navigate({
-				to: session.user.isSuperAdmin ? "/platform-dashboard" : "/dashboard",
-				replace: true,
-			});
+			navigate({ to: "/", replace: true });
 		} catch (error) {
 			toast.error(error instanceof Error ? error.message : "Unable to sign in");
 		} finally {
