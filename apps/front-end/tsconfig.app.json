@@ -18,7 +18,8 @@
 
 		/* Path aliases */
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+		"@dspv2/shared": ["../../packages/shared/src/index.ts"]
 		},
 
 		/* Linting */

@@ -1,5 +1,5 @@
-import { getAccessToken } from "@/lib/auth";
 import { API_BASE_URL } from "@/lib/env";
+import type { ApiErrorEnvelope } from "@dspv2/shared";
 
 export class ApiError extends Error {
 	readonly code: string;
@@ -19,10 +19,7 @@ interface Envelope<T> {
 	message?: string;
 }
 
-interface ErrorEnvelope {
-	success: false;
-	error?: { code?: string; message?: string };
-}
+type ErrorEnvelope = ApiErrorEnvelope;
 
 /**
  * Resolves a route path to the versioned API path. Accepts legacy
@@ -46,16 +43,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 				{ once: true },
 			);
 	}
-	const token = getAccessToken();
-
 	const headers: Record<string, string> = {
 		...(options.body instanceof FormData
 			? {}
 			: { "Content-Type": "application/json" }),
 		...(options.headers as Record<string, string>),
 	};
-	if (token) headers.Authorization = `Bearer ${token}`;
-
 	let res: Response;
 	try {
 		res = await fetch(`${API_BASE_URL}${apiPath(path)}`, {

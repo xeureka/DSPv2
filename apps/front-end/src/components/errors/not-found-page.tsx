@@ -11,8 +11,8 @@ export function NotFoundPage() {
 				The page you're looking for doesn't exist or you don't have access to
 				it.
 			</p>
-			<Link to="/dashboard">
-				<Button variant="secondary">Back to dashboard</Button>
+			<Link to="/">
+				<Button variant="secondary">Back to home</Button>
 			</Link>
 		</div>
 	);

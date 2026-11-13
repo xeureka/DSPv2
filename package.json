@@ -2,34 +2,20 @@
 	"name": "dspv2",
 	"private": true,
 	"type": "module",
-	"module": "index.ts",
 	"scripts": {
 		"dev": "pnpm --parallel --filter @dspv2/backend --filter @dspv2/frontend dev",
 		"dev:frontend": "pnpm --filter @dspv2/frontend dev",
 		"dev:backend": "pnpm --filter @dspv2/backend dev",
-		"build": "tsc",
-		"start": "node dist/index.js",
-		"lint": "oxlint .",
-		"lint:fix": "oxlint . --fix",
-		"format": "oxfmt .",
-		"format:check": "oxfmt . --check",
-		"lint:backend": "pnpm --filter @dspv2/backend lint",
-		"lint:frontend": "pnpm --filter @dspv2/frontend lint",
-		"lint:mobile": "pnpm --filter mobile lint",
-		"format:backend": "pnpm --filter @dspv2/backend format",
-		"format:frontend": "pnpm --filter @dspv2/frontend format",
-		"format:mobile": "pnpm --filter mobile format"
+		"build": "pnpm --filter @dspv2/backend build && pnpm --filter @dspv2/frontend build",
+		"typecheck": "pnpm --filter @dspv2/shared typecheck && pnpm --filter @dspv2/backend typecheck && pnpm --filter @dspv2/frontend typecheck",
+		"lint": "pnpm --filter @dspv2/shared lint && pnpm --filter @dspv2/backend lint && pnpm --filter @dspv2/frontend lint",
+		"format": "pnpm --filter @dspv2/shared format && pnpm --filter @dspv2/backend format && pnpm --filter @dspv2/frontend format",
+		"format:check": "pnpm --filter @dspv2/shared format:check && pnpm --filter @dspv2/backend format:check && pnpm --filter @dspv2/frontend format:check",
+		"test": "pnpm --filter @dspv2/backend test && pnpm --filter @dspv2/frontend test"
 	},
-	"dependencies": {
-		"drizzle-orm": "^1.0.0-rc.4",
-		"zod": "^4.4.3"
+	"engines": {
+		"node": ">=24 <25",
+		"pnpm": "11.23.0"
 	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"oxfmt": "^0.65.0",
-		"oxlint": "^1.80.0"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
-	}
+	"packageManager": "pnpm@11.23.0"
 }

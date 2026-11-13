@@ -42,25 +42,7 @@ export const errorHandler = (error: Error, c: Context) => {
 	}
 
 	const requestId = c.var?.requestId;
-	const databaseError = (error as any)?.cause;
-	console.error(
-		"Unhandled error in errorHandler:",
-		error,
-		databaseError?.detail ?? databaseError,
-	);
-	c.var?.logger?.error(
-		{
-			err: error,
-			dbCode: databaseError?.code,
-			dbDetail: databaseError?.detail,
-			requestId,
-		},
-		"unhandled application error",
-	);
-
-	// Database failures carry SQL text, bound parameters and internal ids in
-	// their message. They are logged above with the request id and never sent
-	// to the client, in any environment.
+	const databaseError = (error as { cause?: { code?: string } }).cause;
 	const isSqlError =
 		error.name === "DrizzleQueryError" ||
 		databaseError?.code !== undefined ||
@@ -69,7 +51,18 @@ export const errorHandler = (error: Error, c: Context) => {
 		/\bselect\b|\binsert into\b|\bupdate\b|\bdelete from\b/i.test(
 			error.message ?? "",
 		);
+	c.var?.logger?.error(
+		{
+			...(isSqlError ? { databaseError: true } : { err: error }),
+			dbCode: databaseError?.code,
+			requestId,
+		},
+		"unhandled application error",
+	);
 
+	// Database failures carry SQL text, bound parameters and internal ids in
+	// their message. They are logged above with the request id and never sent
+	// to the client, in any environment.
 	if (isSqlError) {
 		const message = friendlyDatabaseMessage(databaseError?.code);
 		return errorResponse(c, {
@@ -93,23 +86,23 @@ export const errorHandler = (error: Error, c: Context) => {
 	});
 };
 
-/** Patient-facing copy for Postgres error classes we can recognise. */
+/** Safe client-facing copy for Postgres error classes we can recognise. */
 function friendlyDatabaseMessage(code: string | undefined): string {
 	switch (code) {
 		case "23505":
 			return "That record already exists. Please refresh and try again.";
 		case "23503":
-			return "That record is still in use, so it can't be changed yet.";
+			return "That record is still in use, so it cannot be changed yet.";
 		case "23514":
 		case "23P01":
-			return "Those details don't match the clinic's rules. Please review and try again.";
+			return "Those details do not match the current rules. Please review and try again.";
 		case "25P02":
 		case "40001":
 		case "40P01":
 			return "The request was interrupted by another action. Please try again.";
 		case "57014":
 		case "53300":
-			return "The clinic database is busy right now. Please try again shortly.";
+			return "The database is busy right now. Please try again shortly.";
 		default:
 			return "We couldn't complete that request. Please try again.";
 	}

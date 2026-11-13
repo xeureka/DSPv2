@@ -18,9 +18,6 @@ export const loggingMiddleware = structuredLogger({
 				method: c.req.method,
 				path: c.req.path,
 				userAgent: c.req.header("user-agent"),
-				client: c.req.header("x-dspv2-tenant-id") ? "mobile" : "web",
-				declaredTenantId: c.req.header("x-dspv2-tenant-id"),
-				declaredTenantSlug: c.req.header("x-dspv2-tenant-slug"),
 			},
 			"incoming request",
 		);
@@ -34,9 +31,6 @@ export const loggingMiddleware = structuredLogger({
 			path: c.req.path,
 			status,
 			durationMs: Number(elapsedMs.toFixed(2)),
-			client: c.req.header("x-dspv2-tenant-id") ? "mobile" : "web",
-			declaredTenantId: c.req.header("x-dspv2-tenant-id"),
-			declaredTenantSlug: c.req.header("x-dspv2-tenant-slug"),
 		};
 
 		if (status >= 500) {
@@ -59,9 +53,6 @@ export const loggingMiddleware = structuredLogger({
 				method: c.req.method,
 				path: c.req.path,
 				durationMs: Number(elapsedMs.toFixed(2)),
-				client: c.req.header("x-dspv2-tenant-id") ? "mobile" : "web",
-				declaredTenantId: c.req.header("x-dspv2-tenant-id"),
-				declaredTenantSlug: c.req.header("x-dspv2-tenant-slug"),
 			},
 			"request failed",
 		);

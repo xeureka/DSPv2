@@ -1,12 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { bearer, phoneNumber } from "better-auth/plugins";
-import { expo } from "@better-auth/expo";
-import { env } from "@/lib/env";
-import { smsEthiopiaOtpSender } from "@/services/otp-sender.interface";
 
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { env } from "@/lib/env";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -18,58 +15,19 @@ export const auth = betterAuth({
 			verifications: schema.verifications,
 		},
 	}),
-	plugins: [
-		bearer(),
-		expo(),
-		phoneNumber({
-			otpLength: 6,
-			signUpOnVerification: {
-				getTempEmail: (phone) =>
-					`${phone.replace(/[^0-9]/g, "")}@mobile.dspv2.local`,
-				getTempName: (phone) => phone,
-			},
-			sendOTP: async ({ phoneNumber: phone, code }) => {
-				await smsEthiopiaOtpSender.sendOtp(phone, code);
-			},
-			schema: {
-				user: {
-					fields: {
-						phoneNumber: "phone",
-						phoneNumberVerified: "phoneVerified",
-					},
-				},
-			},
-		}),
-	],
-	trustedOrigins: [
-		env.WEB_APP_URL,
-		"dspv2-ahadu-dental://",
-		"dspv2-ahadu-dental://*",
-		...(process.env.NODE_ENV === "development"
-			? [
-					"exp://",
-					"exp://**",
-					"exp://192.168.*.*:*/**",
-					"http://localhost:8081",
-					"http://127.0.0.1:8081",
-					"http://localhost:5173",
-					"http://127.0.0.1:5173",
-				]
-			: []),
-	],
+	trustedOrigins: [env.WEB_APP_URL],
 	user: {
 		modelName: "users",
 		additionalFields: {
-			isSuperAdmin: {
-				type: "boolean",
-				required: false,
+			role: {
+				type: "string",
+				required: true,
 				input: false,
+				defaultValue: "technician",
 			},
 		},
 		fields: {
 			emailVerified: "emailVerified",
-			phoneNumber: "phone",
-			phoneNumberVerified: "phoneVerified",
 		},
 	},
 	account: {

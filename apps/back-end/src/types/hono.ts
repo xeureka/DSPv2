@@ -1,5 +1,5 @@
 import type { auth } from "../lib/auth";
-import type { Tenant, TenantMembership, Role } from "../db/schema";
+import type { UserRole } from "@dspv2/shared";
 
 type AuthUser = typeof auth.$Infer.Session.user;
 type AuthSession = typeof auth.$Infer.Session.session;
@@ -7,12 +7,7 @@ type AuthSession = typeof auth.$Infer.Session.session;
 export interface AppVariables {
 	user: AuthUser | null;
 	session: AuthSession | null;
-	tenant: Tenant | null;
-	tenantId: string | null;
-	membership: TenantMembership | null;
-	role: Role | null;
-	permissions: string[] | null;
-	doctorId: string | null;
+	role: UserRole | null;
 }
 
 export type AppEnv = {
