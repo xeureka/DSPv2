@@ -163,14 +163,16 @@ Targets: extraction accuracy of at least 90% on the evaluation set, every inject
 ├── eval/                 # Extraction evaluation set and injection tests
 ├── docs/
 │   ├── PRD.md            # Product requirements
-│   └── SRS.pdf           # Solution design and specification (v2)
+│   ├── IMPLEMENTATION_PLAN.md # Phase plan and priorities
+│   └── DispatchPilot_SRS_REVISED.pdf # Solution design and specification (v2)
 └── README.md
 ```
 
 ## Documentation
 
 - [Product Requirements Document](docs/PRD.md): scope, features, workflows, requirements, risks
-- SRS v2: full solution design and specification, including references
+- [Implementation plan](docs/IMPLEMENTATION_PLAN.md): phase order, priorities, and cut gates
+- [SRS v2](docs/DispatchPilot_SRS_REVISED.pdf): full solution design and specification, including references
 
 ## Scope
 
