@@ -24,8 +24,6 @@ export const logger = pino({
 			"req.headers.authorization",
 			"req.headers.cookie",
 			"req.headers.KEY",
-			"SMS_ETHIOPIA",
-			"otp",
 		],
 		censor: "[REDACTED]",
 	},

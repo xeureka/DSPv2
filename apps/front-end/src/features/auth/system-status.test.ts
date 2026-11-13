@@ -4,7 +4,10 @@ import { fetchSystemStatus } from "./system-status";
 
 describe("fetchSystemStatus", () => {
 	it("reports operational when readiness succeeds", async () => {
-		assert.equal(await fetchSystemStatus(async () => ({ status: "ok" })), "operational");
+		assert.equal(
+			await fetchSystemStatus(async () => ({ status: "ok" })),
+			"operational",
+		);
 	});
 
 	it("reports degraded for a server readiness failure", async () => {

@@ -219,8 +219,12 @@
 	transform-box: fill-box;
 	transform-origin: center;
 }
-.login-glass-tile:nth-of-type(2) { animation-delay: -3s; }
-.login-glass-tile:nth-of-type(4) { animation-delay: -7s; }
+.login-glass-tile:nth-of-type(2) {
+	animation-delay: -3s;
+}
+.login-glass-tile:nth-of-type(4) {
+	animation-delay: -7s;
+}
 .login-glass-tile--drift {
 	animation: login-tile-drift 14s ease-in-out infinite;
 }
@@ -281,15 +285,34 @@
 	}
 }
 @keyframes login-entrance {
-	from { opacity: 0; transform: translateY(8px); }
-	to { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 @keyframes login-tile-float {
-	0%, 100% { transform: translateY(0); }
-	50% { transform: translateY(-7px); }
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-7px);
+	}
 }
 @keyframes login-tile-drift {
-	0%, 20% { transform: translate(0, 0); }
-	45%, 70% { transform: translate(175px, -78px); }
-	100% { transform: translate(0, 0); }
+	0%,
+	20% {
+		transform: translate(0, 0);
+	}
+	45%,
+	70% {
+		transform: translate(175px, -78px);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
 }

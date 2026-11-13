@@ -9,20 +9,20 @@ const seedUsers = [
 	[
 		"manager",
 		"SEED_MANAGER_EMAIL",
+		"SEED_MANAGER_NAME",
 		"SEED_MANAGER_PASSWORD",
-		"Dispatch Manager",
 	],
 	[
 		"dispatcher",
 		"SEED_DISPATCHER_EMAIL",
+		"SEED_DISPATCHER_NAME",
 		"SEED_DISPATCHER_PASSWORD",
-		"Dispatch Coordinator",
 	],
 	[
 		"technician",
 		"SEED_TECHNICIAN_EMAIL",
+		"SEED_TECHNICIAN_NAME",
 		"SEED_TECHNICIAN_PASSWORD",
-		"Field Technician",
 	],
 ] as const satisfies readonly [UserRole, string, string, string][];
 
@@ -32,9 +32,23 @@ function required(name: string): string {
 	return value;
 }
 
-async function main() {
-	for (const [role, emailKey, passwordKey, name] of seedUsers) {
+export async function seedStaffUsers() {
+	const context = await auth.$context;
+
+	const linkCredentialAccount = async (userId: string, password: string) => {
+		const passwordHash = await context.password.hash(password);
+		await context.internalAdapter.linkAccount({
+			userId,
+			providerId: "credential",
+			issuer: "local:credential",
+			accountId: userId,
+			password: passwordHash,
+		});
+	};
+
+	for (const [role, emailKey, nameKey, passwordKey] of seedUsers) {
 		const email = required(emailKey);
+		const name = required(nameKey);
 		const password = required(passwordKey);
 		const existing = await db
 			.select({ id: users.id })
@@ -43,21 +57,31 @@ async function main() {
 			.limit(1);
 
 		if (existing[0]) {
-			await db.update(users).set({ role }).where(eq(users.id, existing[0].id));
+			await db
+				.update(users)
+				.set({ role, name })
+				.where(eq(users.id, existing[0].id));
+			const credentialAccount =
+				await context.internalAdapter.findCredentialAccount(existing[0].id);
+			if (!credentialAccount) {
+				await linkCredentialAccount(existing[0].id, password);
+			}
 			continue;
 		}
 
-		const result = await auth.api.signUpEmail({
-			body: { name, email, password },
-		});
-		if (!result.user) throw new Error(`Could not create ${role} seed user`);
-		await db.update(users).set({ role }).where(eq(users.id, result.user.id));
+		const user = await context.internalAdapter.createUser(
+			{ name, email, emailVerified: false, role },
+			{ method: "email-password" },
+		);
+		await linkCredentialAccount(user.id, password);
 	}
 
 	console.log("Seeded one development user for each staff role.");
 }
 
-main().catch((error) => {
-	console.error(error);
-	process.exitCode = 1;
-});
+if (process.argv[1]?.endsWith("/seed.ts")) {
+	seedStaffUsers().catch(() => {
+		console.error("Seed failed; credential values were not logged.");
+		process.exitCode = 1;
+	});
+}

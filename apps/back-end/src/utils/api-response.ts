@@ -10,9 +10,8 @@ import type { ApiErrorEnvelope } from "@dspv2/shared";
  * {
  *   "success": true,
  *   "data": {
- *     "id": "apt_123",
- *     "patientId": "pat_456",
- *     "startTime": "2026-09-01T10:00:00.000Z"
+ *     "id": "resource_123",
+ *     "status": "ready"
  *   }
  * }
  */
@@ -29,15 +28,15 @@ export type SuccessResponse<T> = {
  *   "success": false,
  *   "error": {
  *     "code": "VALIDATION_ERROR",
- *     "message": "startTime must be a valid ISO datetime",
- *     "details": { "field": "startTime", "received": "tomorrow" }
+ *     "message": "The request is invalid",
+ *     "details": { "field": "value", "received": "invalid" }
  *   }
  * }
  *
  * "details" is optional and omitted entirely from the JSON when not provided:
  * {
  *   "success": false,
- *   "error": { "code": "NOT_FOUND", "message": "Appointment not found" }
+ *   "error": { "code": "NOT_FOUND", "message": "Resource not found" }
  * }
  */
 export type ErrorResponse = ApiErrorEnvelope;
@@ -51,10 +50,10 @@ export type ErrorResponse = ApiErrorEnvelope;
  * to match a createRoute() definition whose `responses` declares `200`.
  *
  * Usage:
- *   return successResponse(c, { id: "apt_123", status: "confirmed" });
+ *   return successResponse(c, { id: "resource_123", status: "ready" });
  *   // -> HTTP 200, { success: true, data: {...} }
  *
- *   return successResponse(c, createdAppointment, 201);
+ *   return successResponse(c, createdResource, 201);
  *   // -> HTTP 201, { success: true, data: {...} }
  */
 export function successResponse<T>(

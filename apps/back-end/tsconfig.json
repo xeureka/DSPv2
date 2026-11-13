@@ -14,7 +14,7 @@
 		"noEmit": true,
 		"paths": {
 			"@/*": ["./src/*"],
-		"@dspv2/shared": ["../../packages/shared/src/index.ts"]
+			"@dspv2/shared": ["../../packages/shared/src/index.ts"]
 		},
 		// Best practices
 		"strict": true,

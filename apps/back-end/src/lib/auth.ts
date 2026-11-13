@@ -36,6 +36,7 @@ export const auth = betterAuth({
 			userId: "userId",
 			accountId: "accountId",
 			providerId: "providerId",
+			issuer: "issuer",
 			accessToken: "accessToken",
 			refreshToken: "refreshToken",
 			accessTokenExpiresAt: "accessTokenExpiresAt",
@@ -69,5 +70,6 @@ export const auth = betterAuth({
 	},
 	emailAndPassword: {
 		enabled: true,
+		disableSignUp: true,
 	},
 });

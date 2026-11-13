@@ -14,7 +14,7 @@
 		"seed": "tsx --tsconfig ./tsconfig.json src/db/seed.ts",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
-		"test": "node --import tsx --test \"src/**/*.test.ts\"",
+		"test": "node --import tsx --test --test-concurrency=1 \"src/**/*.test.ts\"",
 		"db:studio": "drizzle-kit studio",
 		"typecheck": "tsc --noEmit",
 		"lint": "oxlint .",

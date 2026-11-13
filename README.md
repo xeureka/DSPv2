@@ -30,20 +30,29 @@ pnpm lint
 pnpm build
 ```
 
-Do not commit either `.env` file. Set `DATABASE_URL`, Better Auth URLs and a
-32-character `BETTER_AUTH_SECRET` in the backend environment. The frontend can
-use an empty `VITE_API_URL` during local development because Vite proxies `/api`.
+Do not commit either `.env` file. Set `DATABASE_URL`, `TEST_DATABASE_URL`, the
+Better Auth URLs, and a 32-character `BETTER_AUTH_SECRET` in the backend
+environment. The frontend can use an empty `VITE_API_URL` during local
+development because Vite proxies `/api`.
 
-Database changes are tracked in `apps/back-end/drizzle`. Run migrations only
-against the intended database:
+The development seed reads these backend variables: `SEED_MANAGER_EMAIL`,
+`SEED_MANAGER_NAME`, `SEED_MANAGER_PASSWORD`, `SEED_DISPATCHER_EMAIL`,
+`SEED_DISPATCHER_NAME`, `SEED_DISPATCHER_PASSWORD`, `SEED_TECHNICIAN_EMAIL`,
+`SEED_TECHNICIAN_NAME`, and `SEED_TECHNICIAN_PASSWORD`. Auth integration tests
+also require `TEST_AUTH_EMAIL` and `TEST_AUTH_PASSWORD`.
+
+Database changes are tracked in `apps/back-end/drizzle`. Confirm that the test
+URL points to a disposable database different from `DATABASE_URL` before using
+it. Run migrations and seeds only against the intended test database:
 
 ```bash
-pnpm --filter @dspv2/backend db:migrate
-pnpm --filter @dspv2/backend seed
+DATABASE_URL="$TEST_DATABASE_URL" pnpm --filter @dspv2/backend db:migrate
+DATABASE_URL="$TEST_DATABASE_URL" pnpm --filter @dspv2/backend seed
 ```
 
-The seed requires development credentials in the backend environment. Never
-run it against production.
+The seed creates exactly one Better Auth credential user for each of the three
+roles and is idempotent. It never changes an existing password. Never run it
+against production.
 
 ## Commands
 

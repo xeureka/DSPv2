@@ -44,6 +44,23 @@
   login form passes the checkbox value directly, with the installed default
   preserved as checked. No storage API is used for credentials or sessions.
 
+## Authentication foundation decisions
+
+- Better Auth 1.7.1 owns user creation, password hashing, credential accounts,
+  sessions, and sign-in/sign-out. The seed uses its server-side internal
+  adapter and password hasher because the public sign-up endpoint is disabled.
+  This preserves Better Auth ID and account formats without exposing a public
+  registration flow.
+- `user.role` is a server-controlled additional field with `input: false` and
+  the database enum values `manager`, `dispatcher`, and `technician`. The
+  public sign-up and user-update inputs cannot choose or change this field.
+- Better Auth 1.7.1 requires `account.issuer` for credential identity lookup;
+  the schema stores it as a required field and uses Better Auth's
+  `local:credential` issuer. No organization or member tables are enabled.
+- The seed reads every user email, name, and password from environment
+  variables, repairs only a missing credential account, and never overwrites
+  an existing password. Verification runs only against `TEST_DATABASE_URL`.
+
 ## Login split layout decisions
 
 - The login screen uses a 50/50 desktop split: an always-dark ink-navy brand
