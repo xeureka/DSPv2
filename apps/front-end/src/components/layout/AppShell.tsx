@@ -1,7 +1,13 @@
 import { Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { authClient } from "../../lib/auth-client.ts";
 
 type StaffRole = "manager" | "dispatcher" | "technician";
@@ -22,7 +28,6 @@ function labelForRole(value: string | undefined): string {
 export function AppShell() {
 	const navigate = useNavigate();
 	const { data: session } = authClient.useSession();
-	const [menuOpen, setMenuOpen] = useState(false);
 
 	const user = session?.user;
 
@@ -79,27 +84,14 @@ export function AppShell() {
 					<p className="hidden text-sm text-slate-500 md:block">
 						Authenticated foundation
 					</p>
-					<div className="relative">
-						<button
-							type="button"
-							className="rounded-lg border border-slate-200 px-3 py-2 text-sm hover:bg-slate-50"
-							onClick={() => setMenuOpen((open) => !open)}
-							aria-expanded={menuOpen}
-						>
-							{user.name || user.email}
-						</button>
-						{menuOpen ? (
-							<div className="absolute right-0 z-10 mt-2 w-40 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
-								<button
-									type="button"
-									className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-50"
-									onClick={handleSignOut}
-								>
-									Sign out
-								</button>
-							</div>
-						) : null}
-					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline">{user.name || user.email}</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</header>
 				<main className="min-w-0 flex-1 p-4 sm:p-6">
 					<Outlet />

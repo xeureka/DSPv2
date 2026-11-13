@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 
 const schema = z.object({
@@ -49,16 +50,25 @@ export function LoginPage() {
 				<h1 className="text-2xl font-semibold tracking-tight">DispatchPilot</h1>
 				<p className="mt-2 text-sm text-slate-500">Sign in to continue.</p>
 				<div className="mt-6 space-y-4">
-					<Field label="Email" error={errors.email?.message}>
-						<Input type="email" autoComplete="email" {...register("email")} />
-					</Field>
-					<Field label="Password" error={errors.password?.message}>
+					<div className="space-y-2">
+						<Label htmlFor="email">Email</Label>
+						<Input id="email" type="email" autoComplete="email" {...register("email")} />
+						{errors.email?.message ? (
+							<p className="text-sm text-destructive">{errors.email.message}</p>
+						) : null}
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="password">Password</Label>
 						<Input
+							id="password"
 							type="password"
 							autoComplete="current-password"
 							{...register("password")}
 						/>
-					</Field>
+						{errors.password?.message ? (
+							<p className="text-sm text-destructive">{errors.password.message}</p>
+						) : null}
+					</div>
 					<Button type="submit" className="w-full" disabled={submitting}>
 						{submitting ? "Signing in…" : "Sign in"}
 					</Button>
