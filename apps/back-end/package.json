@@ -33,6 +33,7 @@
 		"format:check": "oxfmt . --check"
 	},
 	"dependencies": {
+		"@dspv2/shared": "workspace:*",
 		"@better-auth/expo": "^1.7.5",
 		"@hono/node-server": "^2.1.1",
 		"@hono/structured-logger": "^1.0.0",

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "@/lib/env";
+import type { ApiErrorEnvelope } from "@dspv2/shared";
 
 export class ApiError extends Error {
 	readonly code: string;
@@ -18,10 +19,7 @@ interface Envelope<T> {
 	message?: string;
 }
 
-interface ErrorEnvelope {
-	success: false;
-	error?: { code?: string; message?: string };
-}
+type ErrorEnvelope = ApiErrorEnvelope;
 
 /**
  * Resolves a route path to the versioned API path. Accepts legacy

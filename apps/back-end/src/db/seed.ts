@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { users, type UserRole } from "@/db/schema";
+import type { UserRole } from "@dspv2/shared";
+import { users } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 const seedUsers = [

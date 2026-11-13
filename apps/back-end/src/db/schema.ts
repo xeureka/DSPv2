@@ -10,14 +10,9 @@ import {
 	uuid,
 	varchar,
 } from "drizzle-orm/pg-core";
+import { userRoleValues } from "@dspv2/shared";
 
-export const userRole = pgEnum("user_role", [
-	"manager",
-	"dispatcher",
-	"technician",
-]);
-
-export type UserRole = (typeof userRole.enumValues)[number];
+export const userRole = pgEnum("user_role", userRoleValues);
 
 export const users = pgTable("users", {
 	id: uuid("id").defaultRandom().primaryKey(),

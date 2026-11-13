@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from "hono";
 
 import { AppError } from "@/lib/errors/app-error";
 import { ErrorCode } from "@/lib/errors/error-codes";
-import type { UserRole } from "@/db/schema";
+import type { UserRole } from "@dspv2/shared";
 import type { AppEnv } from "@/types/hono";
 
 export function requireRole(

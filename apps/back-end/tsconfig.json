@@ -13,7 +13,8 @@
 		"verbatimModuleSyntax": true,
 		"noEmit": true,
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@dspv2/shared": ["../../packages/shared/src/index.ts"]
 		},
 		// Best practices
 		"strict": true,

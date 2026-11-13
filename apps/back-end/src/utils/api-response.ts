@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { TypedResponse } from "hono";
+import type { ApiErrorEnvelope } from "@dspv2/shared";
 
 /**
  * Standard success envelope.
@@ -39,14 +40,7 @@ export type SuccessResponse<T> = {
  *   "error": { "code": "NOT_FOUND", "message": "Appointment not found" }
  * }
  */
-export type ErrorResponse = {
-	success: false;
-	error: {
-		code: string;
-		message: string;
-		details?: unknown;
-	};
-};
+export type ErrorResponse = ApiErrorEnvelope;
 
 /**
  * Sends a success response.
