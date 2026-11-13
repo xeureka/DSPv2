@@ -1,7 +1,6 @@
 import { useRouter } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
-import { BackendUnavailableError } from "@/lib/auth";
 
 export function RootError({ error }: { error?: unknown }) {
 	const router = useRouter();
@@ -12,17 +11,11 @@ export function RootError({ error }: { error?: unknown }) {
 			: typeof error === "string"
 				? error
 				: "Something went wrong while loading this dashboard";
-	const unavailable = error instanceof BackendUnavailableError;
-
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-slate-50 px-6 text-center">
-			<p className="text-5xl font-bold text-rose-300">
-				{unavailable ? "Offline" : "Error"}
-			</p>
+			<p className="text-5xl font-bold text-rose-300">Error</p>
 			<p className="text-base font-semibold text-slate-800">
-				{unavailable
-					? "The CRM backend is unavailable."
-					: "The application hit an unexpected error."}
+				The application hit an unexpected error.
 			</p>
 			<p className="max-w-sm text-sm text-slate-500">{message}</p>
 			<div className="mt-2 flex items-center gap-2">

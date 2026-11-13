@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { logout, useSession } from "../../lib/auth.ts";
+import { authClient } from "../../lib/auth-client.ts";
 
 type StaffRole = "manager" | "dispatcher" | "technician";
 
@@ -21,7 +21,7 @@ function labelForRole(value: string | undefined): string {
 
 export function AppShell() {
 	const navigate = useNavigate();
-	const { data: session } = useSession();
+	const { data: session } = authClient.useSession();
 	const [menuOpen, setMenuOpen] = useState(false);
 
 	const user = session?.user;
@@ -47,10 +47,10 @@ export function AppShell() {
 		);
 	}
 
-	const role = labelForRole(session?.role?.name);
+	const role = labelForRole((user as { role?: string }).role);
 
 	const handleSignOut = async () => {
-		await logout();
+		await authClient.signOut();
 		toast.success("Signed out");
 		navigate({ to: "/login", replace: true });
 	};
