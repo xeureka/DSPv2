@@ -71,11 +71,24 @@ export function Sidebar({ children }: { children: ReactNode }) {
 	const { collapsed } = useSidebar();
 	return (
 		<aside
+			style={{ position: "relative" }}
 			data-state={collapsed ? "collapsed" : "expanded"}
 			className={`hidden h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex ${collapsed ? "w-16" : "w-64"}`}
 		>
 			{children}
 		</aside>
+	);
+}
+
+export function SidebarRail() {
+	const { toggleCollapsed } = useSidebar();
+	return (
+		<button
+			type="button"
+			aria-label="Toggle sidebar"
+			className="absolute inset-y-0 -right-1 z-20 hidden w-2 cursor-ew-resize md:block"
+			onClick={toggleCollapsed}
+		/>
 	);
 }
 
@@ -110,8 +123,20 @@ export function SidebarToggle({ mobile = false }: { mobile?: boolean }) {
 	);
 }
 
-export function SidebarHeader({ children }: { children: ReactNode }) {
-	return <div className="flex min-h-16 items-center px-4">{children}</div>;
+export function SidebarHeader({
+	children,
+	className = "",
+}: {
+	children: ReactNode;
+	className?: string;
+}) {
+	return (
+		<div
+			className={`flex min-h-14 items-center justify-between px-3 ${className}`}
+		>
+			{children}
+		</div>
+	);
 }
 export function SidebarContent({ children }: { children: ReactNode }) {
 	return <div className="flex-1 overflow-y-auto px-3 py-4">{children}</div>;

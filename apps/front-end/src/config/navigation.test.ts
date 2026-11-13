@@ -5,7 +5,23 @@ import { navigationForRole } from "./navigation";
 test("navigation only includes routes that exist and are allowed for the role", () => {
 	assert.deepEqual(
 		navigationForRole("manager").map((item) => item.label),
-		["Overview"],
+		[
+			"Dispatch Board",
+			"Jobs",
+			"Plan Review",
+			"Contracts and SLA",
+			"Assets",
+			"Simulator",
+			"Approvals and Activity",
+			"Settings",
+		],
 	);
-	assert.deepEqual(navigationForRole("technician"), []);
+	assert.deepEqual(
+		navigationForRole("technician").map((item) => item.label),
+		["My Jobs"],
+	);
+	assert.equal(
+		navigationForRole("technician").some((item) => item.label === "Settings"),
+		false,
+	);
 });

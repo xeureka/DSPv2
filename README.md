@@ -54,6 +54,12 @@ The seed creates exactly one Better Auth credential user for each of the three
 roles and is idempotent. It never changes an existing password. Never run it
 against production.
 
+The frontend currently uses deterministic demo data. Set
+`VITE_USE_MOCK_DATA=false` when wiring the future API adapter; until that
+adapter exists, the UI remains on the mock adapter. Demo mode is visibly marked
+in the authenticated top bar. The seeded role accounts are documented in the
+local, ignored `credentials.md` file.
+
 ## Commands
 
 ```bash

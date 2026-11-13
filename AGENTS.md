@@ -14,6 +14,9 @@
 - Prefer small, focused changes. Preserve existing behavior unless a change is intentional and tested.
 - Do not build features outside the PRD scope. In particular: no multi-tenancy, no payments, no native mobile app, no leftover clinic-domain code.
 - Never fabricate data, benchmark or simulator results, extraction accuracy, test results, or implementation status.
+- Exception: front-end mock data is allowed only inside the `mocks` module, must
+  be typed with shared Zod schemas, visibly flagged as demo data, and
+  replaceable by the real API through the data-access layer.
 
 ## Product and domain rules
 

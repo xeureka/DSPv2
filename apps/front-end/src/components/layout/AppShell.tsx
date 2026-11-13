@@ -1,13 +1,15 @@
 import { Question, SignOut } from "@phosphor-icons/react";
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import type { UserRole } from "@dspv2/shared";
 import {
+	navigationForMobile,
 	navigationForRole,
-	navigationGroups,
 	type NavigationItem,
 } from "@/config/navigation";
 import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -23,12 +25,13 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 	SidebarProvider,
-	SidebarSeparator,
 	SidebarToggle,
+	SidebarRail,
 	Tooltip,
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
+import { USE_MOCK_DATA } from "@/lib/env";
 
 function roleLabel(role: UserRole | undefined) {
 	return role ? role.charAt(0).toUpperCase() + role.slice(1) : "Staff";
@@ -58,23 +61,36 @@ function NavItem({
 	onNavigate?: () => void;
 }) {
 	const Icon = item.icon;
+	const location = useLocation();
+	const active = location.pathname === item.route;
 	return (
 		<Tooltip label={item.label}>
 			<Link
-				to="/"
+				to={item.route as never}
 				onClick={onNavigate}
-				activeOptions={{ exact: true }}
-				activeProps={{
-					className: "bg-sidebar-primary text-sidebar-primary-foreground",
-				}}
-				className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent ${collapsed ? "justify-center px-0" : ""}`}
+				aria-current={active ? "page" : undefined}
+				className={`group flex min-h-10 items-center gap-3 rounded-[10px] px-3 text-sm font-medium text-sidebar-foreground transition-colors duration-150 hover:bg-sidebar-hover hover:text-sidebar-hover-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring active:bg-sidebar-pressed ${active ? "bg-sidebar-active text-sidebar-active-foreground font-semibold" : ""}`}
 			>
-				<Icon aria-hidden="true" size={19} weight="duotone" />
+				<span className="relative flex size-5 shrink-0 items-center justify-center">
+					<Icon
+						aria-hidden="true"
+						size={20}
+						weight={active ? "fill" : "regular"}
+					/>
+					{collapsed && item.badge ? (
+						<span className="absolute -right-1 -top-1 size-1.5 rounded-full bg-status-attention" />
+					) : null}
+				</span>
 				{collapsed ? (
 					<span className="sr-only">{item.label}</span>
 				) : (
-					<span>{item.label}</span>
+					<span className="min-w-0 flex-1 truncate">{item.label}</span>
 				)}
+				{!collapsed && item.badge ? (
+					<span className="rounded-full bg-sidebar-badge px-1.5 py-0.5 text-[10px] font-semibold text-sidebar-badge-foreground">
+						{item.badge}
+					</span>
+				) : null}
 			</Link>
 		</Tooltip>
 	);
@@ -85,25 +101,14 @@ function Navigation({ mobile = false }: { mobile?: boolean }) {
 	const { data: session } = authClient.useSession();
 	const role = (session?.user as { role?: UserRole } | undefined)?.role;
 	return (
-		<nav aria-label="Primary navigation" className="space-y-6">
-			{navigationGroups(role).map(({ group, items }) => (
-				<div key={group}>
-					<p
-						className={`mb-2 px-3 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/60 ${collapsed && !mobile ? "sr-only" : ""}`}
-					>
-						{group}
-					</p>
-					<div className="space-y-1">
-						{items.map((item) => (
-							<NavItem
-								key={item.label}
-								item={item}
-								collapsed={collapsed && !mobile}
-								onNavigate={mobile ? () => setMobileOpen(false) : undefined}
-							/>
-						))}
-					</div>
-				</div>
+		<nav aria-label="Primary navigation" className="space-y-1">
+			{navigationForRole(role).map((item) => (
+				<NavItem
+					key={item.label}
+					item={item}
+					collapsed={collapsed && !mobile}
+					onNavigate={mobile ? () => setMobileOpen(false) : undefined}
+				/>
 			))}
 		</nav>
 	);
@@ -111,36 +116,83 @@ function Navigation({ mobile = false }: { mobile?: boolean }) {
 
 function ShellSidebar() {
 	const { collapsed } = useSidebar();
+	const { data: session } = authClient.useSession();
+	const user = session?.user;
+	const role = (user as { role?: UserRole } | undefined)?.role;
+	const handleSignOut = async () => {
+		await authClient.signOut();
+		window.location.assign("/login");
+	};
 	return (
 		<Sidebar>
-			<SidebarHeader>
-				<Brand compact={collapsed} />
-				<div className="ml-auto">
-					<SidebarToggle />
+			<SidebarHeader className="group">
+				<div className="relative flex min-w-0 items-center">
+					<Brand compact={collapsed} />
+					{collapsed ? (
+						<span className="pointer-events-none absolute left-0 hidden group-hover:flex group-focus-within:flex">
+							<SidebarToggle />
+						</span>
+					) : null}
 				</div>
+				{!collapsed ? <SidebarToggle /> : null}
 			</SidebarHeader>
-			<SidebarSeparator />
 			<SidebarContent>
 				<Navigation />
 			</SidebarContent>
 			<SidebarFooter>
-				<Separator className="mb-3 bg-sidebar-border" />
-				<Button
-					variant="ghost"
-					className={`w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent ${collapsed ? "justify-center px-0" : ""}`}
-				>
-					<Question aria-hidden="true" size={19} />
-					{collapsed ? <span className="sr-only">Help</span> : "Help & support"}
-				</Button>
+				<div className="space-y-1">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="ghost"
+								className={`min-h-10 w-full justify-start gap-3 px-3 text-sidebar-foreground hover:bg-sidebar-hover ${collapsed ? "justify-center px-0" : ""}`}
+							>
+								<Avatar className="size-7 shrink-0 text-[10px]">
+									{user?.name?.slice(0, 1).toUpperCase() || "U"}
+								</Avatar>
+								{collapsed ? (
+									<span className="sr-only">Account</span>
+								) : (
+									<span className="min-w-0 truncate text-left text-xs">
+										{user?.name || user?.email}
+									</span>
+								)}
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="start">
+							<DropdownMenuItem disabled>
+								{roleLabel(role)} · {user?.email}
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={handleSignOut}>
+								<SignOut size={16} /> Sign out
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+					<Button
+						variant="ghost"
+						className={`min-h-10 w-full justify-start gap-3 px-3 text-sidebar-foreground hover:bg-sidebar-hover ${collapsed ? "justify-center px-0" : ""}`}
+					>
+						<Question size={20} />
+						{collapsed ? <span className="sr-only">Help</span> : "Help"}
+					</Button>
+				</div>
 			</SidebarFooter>
+			<SidebarRail />
 		</Sidebar>
 	);
 }
 
 function MobileNavigation() {
+	const { setMobileOpen } = useSidebar();
+	useEffect(() => {
+		const open = () => setMobileOpen(true);
+		window.addEventListener("dispatchpilot:open-mobile-nav", open);
+		return () =>
+			window.removeEventListener("dispatchpilot:open-mobile-nav", open);
+	}, [setMobileOpen]);
 	return (
 		<MobileSidebar>
-			<div className="flex h-full flex-col pt-8">
+			<div className="flex h-full flex-col pt-2">
 				<div className="px-2">
 					<Brand />
 				</div>
@@ -162,11 +214,21 @@ function BottomTabs() {
 			className="safe-bottom border-t border-border bg-card px-2 py-2 md:hidden"
 		>
 			<div className="grid grid-cols-4 gap-1">
-				{navigationForRole(role)
-					.slice(0, 4)
-					.map((item) => (
-						<NavItem key={item.label} item={item} />
-					))}
+				{navigationForMobile(role).map((item) => (
+					<NavItem key={item.label} item={item} />
+				))}
+				{role !== "technician" ? (
+					<button
+						className="flex min-h-11 flex-col items-center justify-center gap-1 rounded-md text-[10px] text-muted-foreground"
+						onClick={() =>
+							window.dispatchEvent(
+								new CustomEvent("dispatchpilot:open-mobile-nav"),
+							)
+						}
+					>
+						More
+					</button>
+				) : null}
 			</div>
 		</nav>
 	);
@@ -200,7 +262,9 @@ export function AppShell() {
 		toast.success("Signed out");
 		navigate({ to: "/login", replace: true });
 	};
-	const current = location.pathname === "/" ? "Overview" : "Workspace";
+	const current =
+		navigationForRole(role).find((item) => item.route === location.pathname)
+			?.label ?? (role === "technician" ? "My Jobs" : "Dispatch Board");
 	return (
 		<SidebarProvider>
 			<div className="flex min-h-screen w-full overflow-x-hidden bg-background text-foreground">
@@ -221,7 +285,15 @@ export function AppShell() {
 								{current}
 							</span>
 						</div>
-						<div className="flex items-center gap-1">
+						<div className="flex items-center gap-2">
+							{USE_MOCK_DATA ? (
+								<Badge
+									variant="secondary"
+									className="hidden rounded-full text-[10px] sm:inline-flex"
+								>
+									Demo data
+								</Badge>
+							) : null}
 							<Button variant="ghost" size="icon" aria-label="Help">
 								<Question size={19} />
 							</Button>

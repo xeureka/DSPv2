@@ -35,6 +35,13 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-hover: var(--sidebar-hover);
+	--color-sidebar-hover-foreground: var(--sidebar-hover-foreground);
+	--color-sidebar-active: var(--sidebar-active);
+	--color-sidebar-active-foreground: var(--sidebar-active-foreground);
+	--color-sidebar-pressed: var(--sidebar-pressed);
+	--color-sidebar-badge: var(--sidebar-badge);
+	--color-sidebar-badge-foreground: var(--sidebar-badge-foreground);
 	--color-status-ok: var(--status-ok);
 	--color-status-ok-soft: var(--status-ok-soft);
 	--color-status-ok-text: var(--status-ok-text);
@@ -103,6 +110,13 @@
 	--sidebar-accent-foreground: #123026;
 	--sidebar-border: #cfe8da;
 	--sidebar-ring: #16a34a;
+	--sidebar-hover: #effaf2;
+	--sidebar-hover-foreground: #14532d;
+	--sidebar-active: #d8f3df;
+	--sidebar-active-foreground: #14532d;
+	--sidebar-pressed: #c8ebd2;
+	--sidebar-badge: #bfe8ca;
+	--sidebar-badge-foreground: #14532d;
 }
 
 @layer base {

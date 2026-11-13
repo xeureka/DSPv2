@@ -1,14 +1,14 @@
 import type { UserRole } from "@dspv2/shared";
 import {
-	ChartLineUp,
+	Buildings,
 	ClipboardText,
-	Gauge,
+	FileText,
+	Flask,
 	GearSix,
-	MapTrifold,
-	Package,
-	ShieldCheck,
+	GitDiff,
+	ListChecks,
+	SealCheck,
 	SquaresFour,
-	UsersThree,
 } from "@phosphor-icons/react";
 import type { ComponentType } from "react";
 
@@ -17,108 +17,84 @@ export type NavigationIcon = ComponentType<{
 	weight?: "regular" | "bold" | "fill" | "duotone" | "thin" | "light";
 }>;
 export type NavigationItem = {
-	group: "Operate" | "Compliance" | "Insights" | "Manage";
 	label: string;
 	route: string;
 	icon: NavigationIcon;
 	allowedRoles: UserRole[];
+	badge?: number;
 };
 
 export const navigation: NavigationItem[] = [
 	{
-		group: "Operate",
-		label: "Overview",
-		route: "/",
+		label: "Dispatch Board",
+		route: "/dispatch",
 		icon: SquaresFour,
 		allowedRoles: ["manager", "dispatcher"],
 	},
 	{
-		group: "Operate",
-		label: "Dispatch Board",
-		route: "/dispatch",
-		icon: Gauge,
-		allowedRoles: ["manager", "dispatcher"],
-	},
-	{
-		group: "Operate",
 		label: "Jobs",
 		route: "/jobs",
 		icon: ClipboardText,
 		allowedRoles: ["manager", "dispatcher"],
 	},
 	{
-		group: "Operate",
-		label: "My Jobs",
-		route: "/my-jobs",
-		icon: Package,
-		allowedRoles: ["technician"],
-	},
-	{
-		group: "Operate",
 		label: "Plan Review",
 		route: "/plan-review",
-		icon: ChartLineUp,
+		icon: GitDiff,
 		allowedRoles: ["manager", "dispatcher"],
+		badge: 1,
 	},
 	{
-		group: "Operate",
-		label: "Map",
-		route: "/map",
-		icon: MapTrifold,
-		allowedRoles: ["manager", "dispatcher"],
-	},
-	{
-		group: "Compliance",
 		label: "Contracts and SLA",
 		route: "/contracts",
-		icon: ShieldCheck,
+		icon: FileText,
 		allowedRoles: ["manager", "dispatcher"],
 	},
 	{
-		group: "Compliance",
 		label: "Assets",
 		route: "/assets",
-		icon: Package,
+		icon: Buildings,
 		allowedRoles: ["manager", "dispatcher"],
 	},
 	{
-		group: "Insights",
 		label: "Simulator",
 		route: "/simulator",
-		icon: ChartLineUp,
-		allowedRoles: ["manager"],
-	},
-	{
-		group: "Insights",
-		label: "Approvals and Activity",
-		route: "/activity",
-		icon: UsersThree,
+		icon: Flask,
 		allowedRoles: ["manager", "dispatcher"],
 	},
 	{
-		group: "Manage",
+		label: "Approvals and Activity",
+		route: "/activity",
+		icon: SealCheck,
+		allowedRoles: ["manager", "dispatcher"],
+		badge: 5,
+	},
+	{
 		label: "Settings",
 		route: "/settings",
 		icon: GearSix,
 		allowedRoles: ["manager"],
 	},
+	{
+		label: "My Jobs",
+		route: "/my-jobs",
+		icon: ListChecks,
+		allowedRoles: ["technician"],
+	},
 ];
 
-const existingRoutes = new Set(["/"]);
+export const existingRoutes = new Set(navigation.map((item) => item.route));
 export function navigationForRole(role: UserRole | undefined) {
 	return navigation.filter(
 		(item) =>
-			existingRoutes.has(item.route) &&
 			!!role &&
-			item.allowedRoles.includes(role),
+			item.allowedRoles.includes(role) &&
+			existingRoutes.has(item.route),
 	);
 }
-
-export function navigationGroups(role: UserRole | undefined) {
-	return ["Operate", "Compliance", "Insights", "Manage"]
-		.map((group) => ({
-			group,
-			items: navigationForRole(role).filter((item) => item.group === group),
-		}))
-		.filter((section) => section.items.length > 0);
+export function navigationForMobile(role: UserRole | undefined) {
+	if (role === "technician") return [];
+	return navigationForRole(role).filter((item) =>
+		["/dispatch", "/jobs", "/activity"].includes(item.route),
+	);
 }

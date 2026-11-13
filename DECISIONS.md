@@ -95,3 +95,24 @@
   soft backgrounds is light OK 6.55:1, scheduled 7.75:1, attention 5.79:1,
   late 7.05:1; dark OK 8.75:1, scheduled 8.88:1, attention 9.10:1, late
   8.88:1. Brand text against the darkest green panel is 13.28:1.
+
+## Mock dashboard decisions
+
+- The sidebar is a flat, heading-free list with a fixed 56px header, a 32px
+  collapse control, Phosphor icons, green hover/active sidebar tokens, and a
+  rail click target. Its collapsed state persists using the existing UI-only
+  preference storage; job and auth data never uses localStorage.
+- Frontend mock data is deterministic with a fixed timestamp and lives only in
+  `apps/front-end/src/mocks`. Shared Zod schemas in `packages/shared` validate
+  jobs, technicians, contracts, assignments, approvals, events, and simulator
+  runs. Query hooks call the mock adapter with 200–400ms latency so pages keep
+  loading/error states when the real API replaces it.
+- Manager and dispatcher use Dispatch Board, Jobs, Plan Review, Contracts and
+  SLA, Assets, Simulator, and Approvals and Activity. Technicians see only My
+  Jobs. Settings is manager-only because the SRS pages table is more specific
+  than the permissions-matrix wording about dispatcher roster visibility.
+- Map is intentionally omitted from this frontend pass because Leaflet and an
+  OSM map adapter are not installed; it is removed from navigation and remains
+  a later task.
+- Sidebar label/icon contrast in the light theme measures: idle `13.89:1`,
+  hover `8.51:1`, active `7.72:1`, and count badge `6.77:1`.

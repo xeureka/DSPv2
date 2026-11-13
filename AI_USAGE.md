@@ -88,6 +88,15 @@ listed below and computed the palette contrast ratios recorded in `DECISIONS.md`
 The live Google provider and browser screenshots were not tested because no
 Google credentials or browser tool were available.
 
+### Mock dashboard task
+
+AI assistance inspected the SRS wireframe text, existing shell, installed
+frontend packages, and shared package; implemented the flat sidebar, shared
+schemas, deterministic mock adapter, query hooks, role guards, and role-based
+dashboard pages. Map was not implemented because no Leaflet/OSM dependency was
+installed and was removed from the navigation. Checks and any remaining
+limitations are reported in the task handoff.
+
 `TODO: fill in at the end of each phase with the real results.`
 
 - `TODO` tests (planner property tests, simulator smoke test, extraction evaluation, injection cases): result and counts
