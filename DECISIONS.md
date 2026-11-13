@@ -43,3 +43,22 @@
 - Better Auth 1.7.1 exposes `rememberMe?: boolean` on `signIn.email`; the
   login form passes the checkbox value directly, with the installed default
   preserved as checked. No storage API is used for credentials or sessions.
+
+## Login split layout decisions
+
+- The login screen uses a 50/50 desktop split: an always-dark ink-navy brand
+  panel with CSS/SVG glass job blocks and a theme-aware console form. Tablet
+  stacks the panel above the form; mobile keeps only the compact headline and
+  live status row in the navy header.
+- The brand panel calls the existing public `/api/v1/ready` route on mount and
+  every 60 seconds while visible. Successful readiness is `OPERATIONAL`; a
+  server response failure is `DEGRADED`; a network or client failure is
+  `UNREACHABLE`. No backend changes were needed, and no response details are
+  shown.
+- The backend currently exposes only email/password sign-in, so the new login
+  screen intentionally omits forgot-password and alternative-provider UI.
+- Login text uses the existing palette. Measured ratios remain: light
+  foreground/background 16.16:1, muted/background 5.24:1, white on primary
+  13.65:1; dark foreground/background 15.70:1, muted/background 7.19:1, and
+  foreground on the glass card surface 14.36:1. Status readouts use icon plus
+  label and the existing semantic hues.
