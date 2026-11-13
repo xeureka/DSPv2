@@ -78,6 +78,10 @@ Entries are added to `DECISIONS.md` as choices are made. The decisions I expect 
 
 ## Verification
 
+### 2026-11-13 implementation entry
+
+The coding agent implemented the B2 intake boundary, shared extraction schemas, deterministic safety and injection scanning, Gemini structured output with fallback/cache, a pure planner/SLA foundation, and scheduler/outbox routes. Verification actually run: backend typecheck, backend lint, backend build, backend test (16 passing), and engine test (1 passing). The frontend typecheck still reports the pre-existing missing `routeTree.gen` artifact.
+
 ### Current UI/auth task
 
 AI assistance inspected the first repository commit, the installed Better Auth
@@ -104,3 +108,8 @@ limitations are reported in the task handoff.
 - `TODO` type check: result
 - `TODO` production build: result
 - `TODO` deployed demo walkthrough on a fresh database: result
+## 2026-11-13
+
+- Implemented the B2 intake boundary with shared Zod `JobDraft` validation, deterministic safety scanning, prompt-injection detection, Gemini structured output, content-hash caching, and a rule-based fallback.
+- Added deterministic planner and SLA engine foundations under `packages/engine`, plus authenticated intake/command and scheduler tick routes.
+- Verified with backend typecheck, backend lint, backend build, backend tests (16 passing), and engine tests (1 passing). Frontend typecheck remains blocked by its pre-existing missing `routeTree.gen` artifact.

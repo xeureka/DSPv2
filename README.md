@@ -2,9 +2,10 @@
 
 DispatchPilot is a single-company field-service operations platform. Managers,
 dispatchers, and technicians will use it to coordinate service work. This
-branch contains only the foundation: authentication, roles, API conventions,
-logging, OpenAPI, database scaffolding, and an empty authenticated UI shell.
-DispatchPilot domain features are intentionally not implemented yet.
+branch contains the backend foundation and Phase B1 core APIs: authentication,
+roles, API conventions, logging, OpenAPI, tracked database migrations, seeded
+domain data, and the first real-data operational endpoints. The frontend remains
+on its documented mock adapter until each feature is swapped to the real API.
 
 ## Stack
 
@@ -76,7 +77,8 @@ pnpm format:check
 
 Backend API documentation is available at `/docs` (Scalar) and
 `/openapi.json`. Health endpoints are `/api/v1/health` and
-`/api/v1/ready`.
+`/api/v1/ready`. The complete B1 route inventory and idempotency/event rules
+are in `docs/API.md`.
 
 ## Layout
 

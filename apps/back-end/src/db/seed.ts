@@ -181,6 +181,8 @@ export async function seedDomainData() {
 			)!,
 			shiftStart: "08:00",
 			shiftEnd: "17:00",
+			latitude: 9.01,
+			longitude: 38.77,
 			status: "available" as const,
 		},
 		{
@@ -190,6 +192,8 @@ export async function seedDomainData() {
 			)!,
 			shiftStart: "09:00",
 			shiftEnd: "18:00",
+			latitude: 9.03,
+			longitude: 38.75,
 			status: "busy" as const,
 		},
 	] as const;
@@ -272,7 +276,7 @@ export async function seedDomainData() {
 			skillRequired: "elevator" as const,
 			urgency: "emergency" as const,
 			safetyFlag: true,
-			status: "attention" as const,
+			status: "received" as const,
 			confidence: "0.990",
 			originalMessage: "A person is trapped in the passenger lift.",
 			notes: "Emergency path; dispatcher approval required.",
@@ -291,7 +295,7 @@ export async function seedDomainData() {
 			skillRequired: "chiller" as const,
 			urgency: "high" as const,
 			safetyFlag: false,
-			status: "scheduled" as const,
+			status: "assigned" as const,
 			confidence: "0.960",
 			originalMessage: "Chiller temperature is rising on level 4.",
 			notes: "SLA-critical maintenance call.",
@@ -310,7 +314,7 @@ export async function seedDomainData() {
 			skillRequired: "refrigeration" as const,
 			urgency: "normal" as const,
 			safetyFlag: false,
-			status: "open" as const,
+			status: "received" as const,
 			confidence: "0.910",
 			originalMessage: "Cold room is warmer than the set point.",
 			notes: "Awaiting deterministic assignment.",
@@ -321,6 +325,12 @@ export async function seedDomainData() {
 		.insert(jobs)
 		.values([...jobRows])
 		.onConflictDoNothing();
+	for (const job of jobRows) {
+		await db
+			.update(jobs)
+			.set({ status: job.status })
+			.where(eq(jobs.id, job.id));
+	}
 	await db
 		.insert(assignments)
 		.values([

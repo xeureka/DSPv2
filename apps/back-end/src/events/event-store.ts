@@ -14,7 +14,7 @@ export type EventInput = {
 	idempotencyKey?: string;
 };
 
-type EventExecutor = Pick<typeof db, "insert" | "select">;
+type EventExecutor = Pick<typeof db, "insert" | "select" | "update">;
 
 export async function appendEvent(
 	input: EventInput,

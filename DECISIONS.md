@@ -85,6 +85,22 @@
   time, seeded geocoding, dry-run mail, and rule-based extraction. Real
   providers can be added without changing domain services.
 
+## Phase B1 API decisions
+
+- B1 keeps the simple assignment baseline behind `CoreService.reassignJob`.
+  Eligible technicians must have the required skill, be available, be inside
+  their configured UTC shift, and are ranked by haversine distance from the
+  job. Technician coordinates are persisted so this baseline remains
+  deterministic and replaceable by the planner in B3.
+- Job workflow transitions are enforced in the service layer. The legacy
+  `open`, `scheduled`, and `attention` values remain readable for seeded or
+  older rows, while new intake uses `received` through `done` (or
+  `cancelled`). Invalid transitions return `INVALID_TRANSITION`.
+- B1 list endpoints use timestamp cursors and compute board KPIs and SLA
+  compliance from current rows rather than storing aggregates. Mutations use
+  the event transaction helper, and repeated approval/status/idempotency
+  operations are safe to retry.
+
 ## Login split layout decisions
 
 - The login screen uses a 50/50 desktop split: an always-dark green brand

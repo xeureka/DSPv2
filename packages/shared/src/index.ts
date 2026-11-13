@@ -108,6 +108,10 @@ export type SimulationRun = z.infer<typeof simulationRunSchema>;
 
 export const eventTypeValues = [
 	"job.received",
+	"intake.safety_scanned",
+	"intake.extracted",
+	"intake.prompt_injection",
+	"intake.fallback",
 	"job.extracted",
 	"job.triaged",
 	"job.safety_flagged",
@@ -136,3 +140,53 @@ export const eventTypeSchema = z.enum(eventTypeValues);
 export type EventType = z.infer<typeof eventTypeSchema>;
 
 export const autonomySchema = z.enum(["auto", "approved"]);
+
+export const equipmentValues = [
+	"elevator",
+	"refrigeration",
+	"chiller",
+	"split unit",
+] as const;
+export const equipmentSchema = z.enum(equipmentValues);
+export const urgencySchema = z.enum(["normal", "high", "emergency"]);
+
+export const evidenceSpanSchema = z.object({
+	text: z.string().min(1).max(240),
+	start: z.number().int().min(0),
+	end: z.number().int().min(0),
+});
+
+export const jobDraftSchema = z.object({
+	equipment: equipmentSchema,
+	skill: z.enum(["elevator", "refrigeration", "chiller", "split unit"]),
+	urgency: urgencySchema,
+	locationText: z.string().max(500).default(""),
+	requester: z.string().max(255).default("Unknown requester"),
+	confidence: z.number().min(0).max(1),
+	evidenceSpans: z.array(evidenceSpanSchema).max(20).default([]),
+});
+export type JobDraft = z.infer<typeof jobDraftSchema>;
+
+export const intakeMessageSchema = z.object({
+	messageId: z.string().min(1).max(255),
+	text: z.string().min(1).max(20_000),
+	requester: z.string().min(1).max(255).optional(),
+	buildingId: z.string().uuid().optional(),
+	receivedAt: z.string().datetime().optional(),
+});
+export type IntakeMessage = z.infer<typeof intakeMessageSchema>;
+
+export const intakeResultSchema = z.object({
+	job: z.unknown(),
+	approval: z.unknown().nullable(),
+	safetyFlag: z.boolean(),
+	usedFallback: z.boolean(),
+});
+
+export const commandIntentSchema = z.discriminatedUnion("intent", [
+	z.object({ intent: z.literal("delay_technician"), technicianId: z.string().uuid(), minutes: z.number().int().positive() }),
+	z.object({ intent: z.literal("move_job"), jobId: z.string().uuid(), technicianId: z.string().uuid() }),
+	z.object({ intent: z.literal("what_if_staffing"), skill: equipmentSchema, count: z.number().int().positive() }),
+	z.object({ intent: z.literal("show_job"), jobId: z.string().uuid() }),
+]);
+export type CommandIntent = z.infer<typeof commandIntentSchema>;

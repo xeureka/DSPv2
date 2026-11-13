@@ -39,6 +39,12 @@ export const contractTier = pgEnum("contract_tier", [
 	"bronze",
 ]);
 export const jobStatus = pgEnum("job_status", [
+	"received",
+	"triaged",
+	"proposed",
+	"assigned",
+	"en_route",
+	"on_site",
 	"open",
 	"scheduled",
 	"attention",
@@ -191,6 +197,8 @@ export const technicians = pgTable(
 			.references(() => users.id, { onDelete: "cascade" }),
 		shiftStart: varchar("shift_start", { length: 5 }).notNull(),
 		shiftEnd: varchar("shift_end", { length: 5 }).notNull(),
+		latitude: real("latitude").notNull().default(9),
+		longitude: real("longitude").notNull().default(38.75),
 		status: technicianStatus("status").notNull().default("available"),
 		...auditColumns,
 	},
@@ -274,6 +282,7 @@ export const jobs = pgTable(
 	"jobs",
 	{
 		id: uuid("id").defaultRandom().primaryKey(),
+		inboundMessageId: varchar("inbound_message_id", { length: 255 }),
 		buildingId: uuid("building_id")
 			.notNull()
 			.references(() => buildings.id, { onDelete: "restrict" }),
@@ -302,6 +311,7 @@ export const jobs = pgTable(
 		...auditColumns,
 	},
 	(table) => [
+		unique("jobs_inbound_message_id_unique").on(table.inboundMessageId),
 		index("jobs_status_idx").on(table.status),
 		index("jobs_sla_due_idx").on(table.slaDueAt),
 		index("jobs_building_idx").on(table.buildingId),
