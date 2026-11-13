@@ -1,19 +1,20 @@
 import "dotenv/config";
+import { after } from "node:test";
 import test from "node:test";
 
-const databaseUrl = process.env.TEST_DATABASE_URL;
-const email = process.env.TEST_AUTH_EMAIL;
-const password = process.env.TEST_AUTH_PASSWORD;
+const databaseUrl = process.env.DATABASE_URL;
+const email = process.env.SEED_MANAGER_EMAIL || "manager@dispatchpilot.local";
+const password =
+	process.env.SEED_MANAGER_PASSWORD || "DispatchPilotManager123!";
 
-if (!databaseUrl || !email || !password) {
-	test("Better Auth sign-in smoke requires TEST_DATABASE_URL and test credentials", () => {
+if (!databaseUrl) {
+	test("Better Auth sign-in smoke requires DATABASE_URL", () => {
 		throw new Error(
-			"Set TEST_DATABASE_URL, TEST_AUTH_EMAIL, and TEST_AUTH_PASSWORD to run the auth smoke test",
+			"Set DATABASE_URL and seed the default manager before running the auth smoke test",
 		);
 	});
 } else {
-	test("Better Auth signs in against the disposable test database", async () => {
-		process.env.DATABASE_URL = databaseUrl;
+	test("Better Auth signs in against DATABASE_URL", async () => {
 		process.env.NODE_ENV = "test";
 		process.env.WEB_APP_URL ??= "http://localhost:5173";
 		process.env.CORS_ORIGINS ??= "http://localhost:5173";
@@ -22,5 +23,10 @@ if (!databaseUrl || !email || !password) {
 			body: { email, password },
 		});
 		if (!result.user) throw new Error("Better Auth did not return a user");
+	});
+
+	after(async () => {
+		const { pool } = await import("./db");
+		await pool.end();
 	});
 }

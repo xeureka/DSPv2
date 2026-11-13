@@ -105,3 +105,34 @@ export const simulationRunSchema = z.object({
 	jobsMoved: z.number(),
 });
 export type SimulationRun = z.infer<typeof simulationRunSchema>;
+
+export const eventTypeValues = [
+	"job.received",
+	"job.extracted",
+	"job.triaged",
+	"job.safety_flagged",
+	"assignment.proposed",
+	"assignment.confirmed",
+	"assignment.reassigned",
+	"technician.status_changed",
+	"technician.late",
+	"plan.proposed",
+	"plan.approved",
+	"plan.rejected",
+	"sla.timer_started",
+	"sla.escalated",
+	"sla.breached",
+	"contract.extracted",
+	"contract.approved",
+	"asset.risk_raised",
+	"inspection.recommended",
+	"message.queued",
+	"message.sent",
+	"settings.changed",
+	"simulation.run",
+] as const;
+
+export const eventTypeSchema = z.enum(eventTypeValues);
+export type EventType = z.infer<typeof eventTypeSchema>;
+
+export const autonomySchema = z.enum(["auto", "approved"]);

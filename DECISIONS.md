@@ -65,7 +65,25 @@
   `local:credential` issuer. No organization or member tables are enabled.
 - The seed reads every user email, name, and password from environment
   variables, repairs only a missing credential account, and never overwrites
-  an existing password. Verification runs only against `TEST_DATABASE_URL`.
+  an existing password. Verification runs against the configured
+  `DATABASE_URL`, which must point to a non-production development database.
+
+## Backend foundation decisions
+
+- Phase B0 uses one tracked Drizzle migration for the DispatchPilot domain
+  tables: buildings, technicians, skills, contracts, SLA rules, assets, jobs,
+  assignments, asset events, duration statistics, events, plan proposals,
+  approvals, outbox, settings, and simulation runs. Better Auth remains on its
+  existing four tables.
+- The B0 seed uses stable UUIDs for domain fixtures and is idempotent through
+  conflict-safe inserts. It creates safe defaults for auto-pilot off,
+  confidence threshold 0.8, and dry-run on.
+- The event store accepts a transaction executor so a domain state mutation and
+  its append-only event can commit or roll back together. Idempotency keys are
+  unique at the database layer.
+- External integrations begin behind fallback-only ports: haversine travel
+  time, seeded geocoding, dry-run mail, and rule-based extraction. Real
+  providers can be added without changing domain services.
 
 ## Login split layout decisions
 

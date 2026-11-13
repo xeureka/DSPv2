@@ -1,13 +1,20 @@
 {
-	"version": "7",
-	"dialect": "postgresql",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "7",
-			"when": 1794544016126,
-			"tag": "0000_thick_nova",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794543748034,
+      "tag": "0000_thick_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794597673187,
+      "tag": "0001_soft_namor",
+      "breakpoints": true
+    }
+  ]
 }
