@@ -6,7 +6,12 @@ import { users } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 const seedUsers = [
-	["manager", "SEED_MANAGER_EMAIL", "SEED_MANAGER_PASSWORD", "Dispatch Manager"],
+	[
+		"manager",
+		"SEED_MANAGER_EMAIL",
+		"SEED_MANAGER_PASSWORD",
+		"Dispatch Manager",
+	],
 	[
 		"dispatcher",
 		"SEED_DISPATCHER_EMAIL",

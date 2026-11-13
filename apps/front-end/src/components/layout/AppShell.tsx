@@ -65,7 +65,9 @@ export function AppShell() {
 			<aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
 				<div className="border-b border-slate-200 px-5 py-4">
 					<p className="text-sm font-semibold">DispatchPilot</p>
-					<p className="mt-1 text-xs text-slate-500">Field operations foundation</p>
+					<p className="mt-1 text-xs text-slate-500">
+						Field operations foundation
+					</p>
 				</div>
 				<nav className="flex-1 px-3 py-4" aria-label="Primary navigation">
 					<p className="rounded-lg px-3 py-2 text-sm text-slate-500">
@@ -89,7 +91,9 @@ export function AppShell() {
 							<Button variant="outline">{user.name || user.email}</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+							<DropdownMenuItem onClick={handleSignOut}>
+								Sign out
+							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</header>

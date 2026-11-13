@@ -26,7 +26,6 @@ const pool = new Pool({
 	// after long-lived connections or schema changes
 });
 
-
 export const db = drizzle({
 	client: pool,
 });

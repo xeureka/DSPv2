@@ -1,8 +1,10 @@
 import "dotenv/config";
 import { z } from "zod";
 
-const envSchema = z.object({
-	NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+export const envSchema = z.object({
+	NODE_ENV: z
+		.enum(["development", "test", "production"])
+		.default("development"),
 	PORT: z.coerce.number().int().positive().max(65535).default(3000),
 	HOST: z.string().default("0.0.0.0"),
 	DATABASE_URL: z
@@ -21,7 +23,11 @@ const envSchema = z.object({
 		.default("info"),
 });
 
-const parsedEnv = envSchema.safeParse(process.env);
+export function parseEnv(input: NodeJS.ProcessEnv) {
+	return envSchema.safeParse(input);
+}
+
+const parsedEnv = parseEnv(process.env);
 
 if (!parsedEnv.success) {
 	console.error("Invalid environment variables:");

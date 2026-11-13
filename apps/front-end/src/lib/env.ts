@@ -4,18 +4,6 @@ const RAW_API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 /** Trailing slash stripped so `${API_BASE_URL}${path}` never double-slashes. */
 const API_ORIGIN = RAW_API_URL.trim().replace(/\/+$/, "");
 
-function isNativePlatform(): boolean {
-	if (typeof window === "undefined") return false;
-	const capacitor = (
-		window as unknown as {
-			Capacitor?: { isNativePlatform?: () => boolean };
-		}
-	).Capacitor;
-	return typeof capacitor?.isNativePlatform === "function"
-		? capacitor.isNativePlatform()
-		: false;
-}
-
 /** API origin; empty means same-origin (web dev, where Vite proxies `/api`). */
 export const API_BASE_URL: string = API_ORIGIN;
 
@@ -28,7 +16,7 @@ export const API_BASE_URL: string = API_ORIGIN;
 export const AUTH_BASE_URL: string =
 	API_ORIGIN || (typeof window !== "undefined" ? window.location.origin : "");
 
-if (!API_ORIGIN && (import.meta.env.PROD || isNativePlatform())) {
+if (!API_ORIGIN && import.meta.env.PROD) {
 	console.error(
 		"VITE_API_URL is not set — auth and API requests will be sent to this app's own origin instead of the backend.",
 	);

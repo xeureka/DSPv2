@@ -20,7 +20,10 @@ const healthRoute = createRoute({
 	method: "get",
 	path: "/health",
 	responses: {
-		200: { content: { "application/json": { schema: successStatusSchema } }, description: "Service is healthy" },
+		200: {
+			content: { "application/json": { schema: successStatusSchema } },
+			description: "Service is healthy",
+		},
 	},
 });
 
@@ -28,8 +31,14 @@ const readyRoute = createRoute({
 	method: "get",
 	path: "/ready",
 	responses: {
-		200: { content: { "application/json": { schema: successStatusSchema } }, description: "Service is ready" },
-		503: { content: { "application/json": { schema: z.any() } }, description: "Dependencies are unavailable" },
+		200: {
+			content: { "application/json": { schema: successStatusSchema } },
+			description: "Service is ready",
+		},
+		503: {
+			content: { "application/json": { schema: z.any() } },
+			description: "Dependencies are unavailable",
+		},
 	},
 });
 

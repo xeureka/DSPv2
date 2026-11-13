@@ -11,10 +11,13 @@
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
-		"noEmit": true,
+		"composite": true,
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"outDir": "dist-types",
 		"paths": {
 			"@/*": ["./src/*"],
-			"@dspv2/shared": ["../../packages/shared/src/index.ts"]
+			"@dspv2/shared": ["../../packages/shared/dist/index.d.ts", "../../packages/shared/dist/src/index.d.ts"]
 		},
 		// Best practices
 		"strict": true,
@@ -26,5 +29,7 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false
-	}
+	},
+	"references": [{ "path": "../../packages/shared" }],
+	"include": ["src"]
 }

@@ -33,19 +33,15 @@ app.use(
 			);
 			if (configuredOrigins.includes(origin)) return origin;
 			if (
-					env.NODE_ENV !== "production" &&
-					/^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(origin)
+				env.NODE_ENV !== "production" &&
+				/^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(origin)
 			) {
 				return origin;
 			}
 			return undefined;
 		},
 		credentials: true,
-		allowHeaders: [
-			"Content-Type",
-			"Authorization",
-			"Cookie",
-		],
+		allowHeaders: ["Content-Type", "Authorization", "Cookie"],
 	}),
 );
 

@@ -52,7 +52,12 @@ export function LoginPage() {
 				<div className="mt-6 space-y-4">
 					<div className="space-y-2">
 						<Label htmlFor="email">Email</Label>
-						<Input id="email" type="email" autoComplete="email" {...register("email")} />
+						<Input
+							id="email"
+							type="email"
+							autoComplete="email"
+							{...register("email")}
+						/>
 						{errors.email?.message ? (
 							<p className="text-sm text-destructive">{errors.email.message}</p>
 						) : null}
@@ -66,7 +71,9 @@ export function LoginPage() {
 							{...register("password")}
 						/>
 						{errors.password?.message ? (
-							<p className="text-sm text-destructive">{errors.password.message}</p>
+							<p className="text-sm text-destructive">
+								{errors.password.message}
+							</p>
 						) : null}
 					</div>
 					<Button type="submit" className="w-full" disabled={submitting}>

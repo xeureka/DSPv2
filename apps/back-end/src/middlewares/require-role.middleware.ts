@@ -11,7 +11,11 @@ export function requireRole(
 	return async (c, next) => {
 		const user = c.get("user");
 		if (!user) {
-			throw new AppError("Authentication required", 401, ErrorCode.UNAUTHORIZED);
+			throw new AppError(
+				"Authentication required",
+				401,
+				ErrorCode.UNAUTHORIZED,
+			);
 		}
 
 		const role = user.role as UserRole | undefined;
