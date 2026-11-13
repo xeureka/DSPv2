@@ -87,3 +87,15 @@ The dashboard and login layouts are responsive and include light/dark theme
 tokens, but screenshot verification is not recorded in this environment: no
 browser or screenshot runner was available, and the referenced
 `docs/design/reference-dashboard.png` file was not present.
+
+### Google sign-in and password reset
+
+Google sign-in is optional. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+in the backend environment to enable the existing-user-only provider. Register
+these redirect URIs in Google Cloud Console:
+
+- Local: `http://localhost:3001/api/auth/callback/google`
+- Production: `https://<your-cloud-run-service-domain>/api/auth/callback/google`
+
+The reset flow uses Better Auth. In development, or with `DRY_RUN=true`, the
+reset URL is logged by the backend adapter; no email provider is bundled yet.

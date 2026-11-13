@@ -70,6 +70,17 @@ const getClientIp = (c: any) => {
 const isDev = env.NODE_ENV === "development" || env.NODE_ENV === "test";
 
 app.use(
+	"/api/auth/request-password-reset",
+	rateLimiter({
+		windowMs: 15 * 60 * 1000,
+		limit: 5,
+		standardHeaders: "draft-6",
+		keyGenerator: getClientIp,
+		skip: () => isDev,
+	}),
+);
+
+app.use(
 	"/api/auth/*",
 	rateLimiter({
 		windowMs: 15 * 60 * 1000,

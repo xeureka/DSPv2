@@ -1,5 +1,11 @@
-import { List, SidebarSimple } from "@phosphor-icons/react";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { CaretDoubleLeft, CaretDoubleRight, List } from "@phosphor-icons/react";
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useState,
+	type ReactNode,
+} from "react";
 import { Button } from "./button";
 import { Separator } from "./separator";
 import { Sheet } from "./sheet";
@@ -20,6 +26,23 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 			window.localStorage.getItem("dispatchpilot-sidebar-collapsed") === "true",
 	);
 	const [mobileOpen, setMobileOpen] = useState(false);
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") {
+				event.preventDefault();
+				setCollapsed((value) => {
+					const next = !value;
+					window.localStorage.setItem(
+						"dispatchpilot-sidebar-collapsed",
+						String(next),
+					);
+					return next;
+				});
+			}
+		};
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, []);
 	const toggleCollapsed = () =>
 		setCollapsed((value) => {
 			const next = !value;
@@ -48,7 +71,8 @@ export function Sidebar({ children }: { children: ReactNode }) {
 	const { collapsed } = useSidebar();
 	return (
 		<aside
-			className={`hidden shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex ${collapsed ? "w-20" : "w-64"}`}
+			data-state={collapsed ? "collapsed" : "expanded"}
+			className={`hidden h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex ${collapsed ? "w-16" : "w-64"}`}
 		>
 			{children}
 		</aside>
@@ -65,15 +89,23 @@ export function MobileSidebar({ children }: { children: ReactNode }) {
 }
 
 export function SidebarToggle({ mobile = false }: { mobile?: boolean }) {
-	const { setMobileOpen, toggleCollapsed } = useSidebar();
+	const { collapsed, setMobileOpen, toggleCollapsed } = useSidebar();
 	return (
 		<Button
 			variant="ghost"
 			size="icon"
 			aria-label={mobile ? "Open navigation" : "Toggle navigation"}
+			aria-expanded={mobile ? undefined : !collapsed}
+			className="size-8 shrink-0"
 			onClick={() => (mobile ? setMobileOpen(true) : toggleCollapsed())}
 		>
-			{mobile ? <List size={20} /> : <SidebarSimple size={20} />}
+			{mobile ? (
+				<List size={20} />
+			) : collapsed ? (
+				<CaretDoubleRight size={18} />
+			) : (
+				<CaretDoubleLeft size={18} />
+			)}
 		</Button>
 	);
 }

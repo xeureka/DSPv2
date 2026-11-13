@@ -4,6 +4,11 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { env } from "@/lib/env";
+import { sendResetPasswordEmail } from "@/lib/email";
+
+export const googleSignInConfigured = Boolean(
+	env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET,
+);
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -43,6 +48,11 @@ export const auth = betterAuth({
 			refreshTokenExpiresAt: "refreshTokenExpiresAt",
 			password: "password",
 		},
+		accountLinking: {
+			enabled: true,
+			disableImplicitLinking: false,
+			trustedProviders: ["google"],
+		},
 	},
 	session: {
 		modelName: "sessions",
@@ -71,5 +81,21 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		disableSignUp: true,
+		resetPasswordTokenExpiresIn: 3600,
+		revokeSessionsOnPasswordReset: true,
+		sendResetPassword: async ({ user, url }) => {
+			await sendResetPasswordEmail({ email: user.email, url });
+		},
 	},
+	...(googleSignInConfigured
+		? {
+				socialProviders: {
+					google: {
+						clientId: env.GOOGLE_CLIENT_ID as string,
+						clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+						disableSignUp: true,
+					},
+				},
+			}
+		: {}),
 });

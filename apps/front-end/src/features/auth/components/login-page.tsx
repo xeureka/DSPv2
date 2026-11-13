@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
+import { Link } from "@tanstack/react-router";
+import { TypewriterDispatch } from "@/features/auth/components/typewriter-dispatch";
 import {
 	loginSchema,
 	passwordInputType,
@@ -83,11 +85,11 @@ function DispatchArt() {
 					<stop offset="1" stopColor="#dc2626" stopOpacity=".08" />
 				</linearGradient>
 				<pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
-					<circle cx="1" cy="1" r="1" fill="#dde3ff" fillOpacity=".15" />
+					<circle cx="1" cy="1" r="1" fill="#dcfce7" fillOpacity=".15" />
 				</pattern>
 			</defs>
 			<rect width="620" height="340" fill="url(#dots)" />
-			<g fill="none" stroke="#dde3ff" strokeOpacity=".1">
+			<g fill="none" stroke="#dcfce7" strokeOpacity=".1">
 				<path d="M42 92h536M42 170h536M42 248h536" />
 			</g>
 			<g
@@ -122,7 +124,7 @@ function DispatchArt() {
 			>
 				<rect x="456" y="67" width="96" height="43" rx="8" />
 			</g>
-			<g fill="#e6eaf2" fillOpacity=".55" fontFamily="monospace" fontSize="10">
+			<g fill="#e8f5ec" fillOpacity=".55" fontFamily="monospace" fontSize="10">
 				<text x="88" y="93">
 					OWNER ASSIGNED
 				</text>
@@ -140,7 +142,7 @@ function DispatchArt() {
 	);
 }
 
-function BrandPanel({ status }: { status: SystemStatusState }) {
+export function BrandPanel({ status }: { status: SystemStatusState }) {
 	return (
 		<section className="login-brand-panel relative min-h-[260px] overflow-hidden border-b border-white/10 px-5 py-6 text-white sm:px-8 lg:min-h-[100svh] lg:border-b-0 lg:border-r lg:px-10 lg:py-10 xl:px-16">
 			<DispatchArt />
@@ -171,6 +173,7 @@ function BrandPanel({ status }: { status: SystemStatusState }) {
 							</span>
 						</div>
 					</div>
+					<TypewriterDispatch />
 				</div>
 			</div>
 		</section>
@@ -185,6 +188,8 @@ export function LoginPage() {
 	const [submitting, setSubmitting] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [apiError, setApiError] = useState<string | null>(null);
+	const [googleEnabled, setGoogleEnabled] = useState(false);
+	const [googleChecked, setGoogleChecked] = useState(false);
 	const [systemStatus, setSystemStatus] =
 		useState<SystemStatusState>("loading");
 	const {
@@ -220,6 +225,14 @@ export function LoginPage() {
 		};
 	}, []);
 
+	useEffect(() => {
+		void api
+			.get<{ googleEnabled: boolean }>("/auth/config")
+			.then((config) => setGoogleEnabled(config.googleEnabled))
+			.catch(() => setGoogleEnabled(false))
+			.finally(() => setGoogleChecked(true));
+	}, []);
+
 	if (session?.user) return <Navigate to="/" replace />;
 
 	const onSubmit = async (values: LoginFormValues) => {
@@ -243,6 +256,20 @@ export function LoginPage() {
 			);
 		} finally {
 			setSubmitting(false);
+		}
+	};
+
+	const signInWithGoogle = async () => {
+		if (!googleEnabled) return;
+		setApiError(null);
+		const result = await authClient.signIn.social({
+			provider: "google",
+			callbackURL: window.location.origin,
+		});
+		if (result.error) {
+			setApiError(
+				"Unable to sign in with Google. Use an existing staff account.",
+			);
 		}
 	};
 
@@ -321,9 +348,15 @@ export function LoginPage() {
 									<div className="space-y-2">
 										<Label
 											htmlFor="password"
-											className="font-mono text-[10px] tracking-[0.16em]"
+											className="flex items-center justify-between font-mono text-[10px] tracking-[0.16em]"
 										>
-											PASSWORD
+											<span>PASSWORD</span>
+											<Link
+												to="/forgot-password"
+												className="text-[10px] tracking-[0.1em] text-accent hover:underline"
+											>
+												FORGOT PASSWORD?
+											</Link>
 										</Label>
 										<div className="relative">
 											<LockKey
@@ -391,6 +424,43 @@ export function LoginPage() {
 										)}
 									</Button>
 								</form>
+								<div className="my-6 flex items-center gap-3 font-mono text-[9px] tracking-[0.14em] text-muted-foreground">
+									<span className="h-px flex-1 bg-border" />
+									<span>OR CONTINUE WITH</span>
+									<span className="h-px flex-1 bg-border" />
+								</div>
+								<Button
+									variant="outline"
+									className="min-h-11 w-full rounded-sm font-mono text-xs tracking-[0.1em]"
+									disabled={!googleChecked || submitting}
+									onClick={() => void signInWithGoogle()}
+								>
+									<svg
+										aria-hidden="true"
+										viewBox="0 0 24 24"
+										className="size-4"
+									>
+										<path
+											fill="#4285F4"
+											d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.69 2.91-4.18 2.91-7.25Z"
+										/>
+										<path
+											fill="#34A853"
+											d="M12 21.5c2.63 0 4.84-.87 6.45-2.35l-3.14-2.44c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.52A9.74 9.74 0 0 0 12 21.5Z"
+										/>
+										<path
+											fill="#FBBC05"
+											d="M6.54 13.6A5.85 5.85 0 0 1 6.23 12c0-.56.11-1.1.31-1.6V7.88H3.3A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.12l3.24-2.52Z"
+										/>
+										<path
+											fill="#EA4335"
+											d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.48 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.38l3.24 2.52C7.31 8.1 9.46 6.38 12 6.38Z"
+										/>
+									</svg>
+									{googleChecked && !googleEnabled
+										? "GOOGLE SIGN-IN IS NOT CONFIGURED"
+										: "CONTINUE WITH GOOGLE"}
+								</Button>
 								<p className="mt-6 border-t border-border pt-5 text-center font-mono text-[10px] tracking-[0.12em] text-muted-foreground">
 									NEED AN ACCOUNT? ASK YOUR MANAGER.
 								</p>

@@ -58,25 +58,25 @@
 }
 
 :root {
-	--background: #f1f3f6;
-	--card: #fbfcfd;
-	--popover: #fbfcfd;
-	--border: #e3e7ec;
-	--input: #e3e7ec;
-	--foreground: #0e1726;
-	--card-foreground: #0e1726;
-	--popover-foreground: #0e1726;
-	--muted-foreground: #5b6676;
-	--primary: #1e2b57;
+	--background: #ecfdf5;
+	--card: #f7fefa;
+	--popover: #f7fefa;
+	--border: #cfe8da;
+	--input: #cfe8da;
+	--foreground: #123026;
+	--card-foreground: #123026;
+	--popover-foreground: #123026;
+	--muted-foreground: #527066;
+	--primary: #15803d;
 	--primary-foreground: #ffffff;
-	--secondary: #e9edf3;
-	--secondary-foreground: #0e1726;
-	--muted: #e9edf3;
-	--accent: #4f46e5;
+	--secondary: #e1f3e8;
+	--secondary-foreground: #123026;
+	--muted: #e1f3e8;
+	--accent: #16a34a;
 	--accent-foreground: #ffffff;
-	--ring: #4f46e5;
+	--ring: #16a34a;
 	--destructive: #dc2626;
-	--chart-1: #4f46e5;
+	--chart-1: #15803d;
 	--chart-2: #0d9488;
 	--chart-3: #2563eb;
 	--chart-4: #d97706;
@@ -94,36 +94,36 @@
 	--status-late: #dc2626;
 	--status-late-soft: #fbdcdc;
 	--status-late-text: #8e1b1b;
-	--sidebar: #fbfcfd;
-	--sidebar-foreground: #0e1726;
-	--sidebar-primary: #1e2b57;
+	--sidebar: #f7fefa;
+	--sidebar-foreground: #123026;
+	--sidebar-primary: #15803d;
 	--sidebar-primary-foreground: #ffffff;
-	--sidebar-accent: #e9edf3;
-	--sidebar-accent-foreground: #0e1726;
-	--sidebar-border: #e3e7ec;
-	--sidebar-ring: #4f46e5;
+	--sidebar-accent: #e1f3e8;
+	--sidebar-accent-foreground: #123026;
+	--sidebar-border: #cfe8da;
+	--sidebar-ring: #16a34a;
 }
 
 .dark {
-	--background: #0b1020;
-	--card: #121a2e;
-	--popover: #121a2e;
-	--border: #222c45;
-	--input: #222c45;
-	--foreground: #e6eaf2;
-	--card-foreground: #e6eaf2;
-	--popover-foreground: #e6eaf2;
-	--muted-foreground: #94a0b8;
-	--primary: #dde3ff;
-	--primary-foreground: #1e2b57;
-	--secondary: #18233b;
-	--secondary-foreground: #e6eaf2;
-	--muted: #18233b;
-	--accent: #7c86f2;
-	--accent-foreground: #0b1020;
-	--ring: #7c86f2;
+	--background: #071a12;
+	--card: #0d2619;
+	--popover: #0d2619;
+	--border: #1c4a30;
+	--input: #1c4a30;
+	--foreground: #e8f5ec;
+	--card-foreground: #e8f5ec;
+	--popover-foreground: #e8f5ec;
+	--muted-foreground: #a5c7b0;
+	--primary: #4ade80;
+	--primary-foreground: #052e16;
+	--secondary: #123b25;
+	--secondary-foreground: #e8f5ec;
+	--muted: #123b25;
+	--accent: #4ade80;
+	--accent-foreground: #052e16;
+	--ring: #4ade80;
 	--destructive: #f87171;
-	--chart-1: #7c86f2;
+	--chart-1: #4ade80;
 	--chart-2: #2dd4bf;
 	--chart-3: #60a5fa;
 	--chart-4: #fbbf24;
@@ -140,14 +140,14 @@
 	--status-late: #f87171;
 	--status-late-soft: #4b2028;
 	--status-late-text: #ffc1c1;
-	--sidebar: #121a2e;
-	--sidebar-foreground: #e6eaf2;
-	--sidebar-primary: #dde3ff;
-	--sidebar-primary-foreground: #1e2b57;
-	--sidebar-accent: #18233b;
-	--sidebar-accent-foreground: #e6eaf2;
-	--sidebar-border: #222c45;
-	--sidebar-ring: #7c86f2;
+	--sidebar: #0d2619;
+	--sidebar-foreground: #e8f5ec;
+	--sidebar-primary: #4ade80;
+	--sidebar-primary-foreground: #052e16;
+	--sidebar-accent: #123b25;
+	--sidebar-accent-foreground: #e8f5ec;
+	--sidebar-border: #1c4a30;
+	--sidebar-ring: #4ade80;
 }
 
 @layer base {
@@ -178,8 +178,8 @@
 }
 .brand-grid {
 	background-image:
-		linear-gradient(rgb(221 227 255 / 0.08) 1px, transparent 1px),
-		linear-gradient(90deg, rgb(221 227 255 / 0.08) 1px, transparent 1px);
+		linear-gradient(rgb(220 252 231 / 0.08) 1px, transparent 1px),
+		linear-gradient(90deg, rgb(220 252 231 / 0.08) 1px, transparent 1px);
 	background-size: 32px 32px;
 }
 .login-card-enter {
@@ -203,16 +203,26 @@
 	transform: rotate(-90deg);
 }
 .login-brand-panel {
-	background: linear-gradient(135deg, #1e2b57 0%, #0b1020 82%);
+	background: linear-gradient(135deg, #14532d 0%, #052e16 82%);
 }
 .login-dispatch-art {
 	opacity: 0.75;
 	filter: blur(0.2px);
 }
 .login-glass-card {
-	border: 1px solid rgb(230 234 242 / 0.2);
-	background: rgb(11 16 32 / 0.52);
+	border: 1px solid rgb(220 252 231 / 0.2);
+	background: rgb(5 46 22 / 0.52);
 	box-shadow: 0 24px 80px rgb(0 0 0 / 0.18);
+}
+.typewriter-dispatch {
+	max-width: 100%;
+	overflow: hidden;
+}
+.typewriter-key-active {
+	border-color: rgb(134 239 172 / 0.75);
+	background: rgb(22 163 74 / 0.42);
+	color: #f0fdf4;
+	box-shadow: 0 0 12px rgb(74 222 128 / 0.35);
 }
 .login-glass-tile {
 	animation: login-tile-float 12s ease-in-out infinite;
@@ -314,5 +324,16 @@
 	}
 	100% {
 		transform: translate(0, 0);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.login-glass-tile,
+	.login-glass-tile--drift,
+	.login-entrance,
+	.login-card-shake {
+		animation: none;
+	}
+	.typewriter-key-active {
+		box-shadow: none;
 	}
 }

@@ -26,11 +26,13 @@
 
 ## UI shell and login decisions
 
-- The UI palette uses the requested tinted-neutral surfaces (`#F1F3F6` and
-  `#FBFCFD`) with deep ink navy (`#1E2B57`) as the main action colour. Indigo
-  is reserved for focus, links, selected rows, and chart accents. Teal, blue,
-  amber, and red are reserved for semantic statuses and are always paired with
-  a Phosphor icon and text label.
+- The UI palette is the first-commit design direction extended into a complete
+  green system: light background `#ECFDF5`, surface `#F7FEFA`, border
+  `#CFE8DA`, text `#123026`, muted text `#527066`, and primary `#15803D`.
+  Dark mode uses `#071A12`, `#0D2619`, `#1C4A30`, `#E8F5EC`, `#A5C7B0`, and
+  `#4ADE80`. The first commit did not contain a complete green base palette;
+  it supplied the emerald visual direction and restrained radius/surfaces,
+  which are preserved here without restoring clinic UI.
 - The palette is defined once in `apps/front-end/src/styles/index.css` and
   mapped to shadcn background, card, border, foreground, muted, primary,
   accent, ring, chart, and sidebar tokens. Measured WCAG ratios are recorded
@@ -63,7 +65,7 @@
 
 ## Login split layout decisions
 
-- The login screen uses a 50/50 desktop split: an always-dark ink-navy brand
+- The login screen uses a 50/50 desktop split: an always-dark green brand
   panel with CSS/SVG glass job blocks and a theme-aware console form. Tablet
   stacks the panel above the form; mobile keeps only the compact headline and
   live status row in the navy header.
@@ -72,10 +74,20 @@
   server response failure is `DEGRADED`; a network or client failure is
   `UNREACHABLE`. No backend changes were needed, and no response details are
   shown.
-- The backend currently exposes only email/password sign-in, so the new login
-  screen intentionally omits forgot-password and alternative-provider UI.
-- Login text uses the existing palette. Measured ratios remain: light
-  foreground/background 16.16:1, muted/background 5.24:1, white on primary
-  13.65:1; dark foreground/background 15.70:1, muted/background 7.19:1, and
-  foreground on the glass card surface 14.36:1. Status readouts use icon plus
-  label and the existing semantic hues.
+- Google sign-in is enabled only when both optional Google credentials exist.
+  Better Auth disables Google sign-up and trusts only the configured Google
+  provider for linking, so an unknown Google email cannot create a staff user.
+  The UI exposes a clear unconfigured state when credentials are absent.
+- Password reset uses Better Auth's one-use, one-hour token flow, revokes
+  sessions after reset, and returns a generic request-success message. The
+  adapter logs the reset URL only outside production or when `DRY_RUN=true`;
+  a real sender is intentionally not added.
+- The brand panel keeps the floating status tiles and adds an illustrative
+  typewriter/conveyor animation. It is `aria-hidden`, CSS/React-only, and
+  becomes static under reduced motion.
+- Measured WCAG ratios for the updated palette are: light body 13.50:1, light
+  card 13.89:1, light muted 5.15:1, light primary 5.02:1; dark body 16.05:1,
+  dark card 14.29:1, dark muted 9.78:1, dark primary 8.55:1. Status text on
+  soft backgrounds is light OK 6.55:1, scheduled 7.75:1, attention 5.79:1,
+  late 7.05:1; dark OK 8.75:1, scheduled 8.88:1, attention 9.10:1, late
+  8.88:1. Brand text against the darkest green panel is 13.28:1.

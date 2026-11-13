@@ -18,6 +18,13 @@ export const envSchema = z.object({
 	BETTER_AUTH_URL: z.string().url("BETTER_AUTH_URL must be a valid URL"),
 	WEB_APP_URL: z.string().url("WEB_APP_URL must be a valid URL"),
 	CORS_ORIGINS: z.string().min(1, "CORS_ORIGINS must not be empty"),
+	GOOGLE_CLIENT_ID: z.string().optional(),
+	GOOGLE_CLIENT_SECRET: z.string().optional(),
+	DRY_RUN: z.preprocess(
+		(value) =>
+			typeof value === "string" ? value.toLowerCase() === "true" : value,
+		z.boolean().default(true),
+	),
 	LOG_LEVEL: z
 		.enum(["trace", "debug", "info", "warn", "error", "fatal"])
 		.default("info"),
