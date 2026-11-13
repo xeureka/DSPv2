@@ -13,3 +13,11 @@
   examples, and focused foundation tests. The disposable-database auth smoke
   test remains pending until the requested `TEST_DATABASE_URL` and test
   credentials are provided.
+- On the UI branch, inspected installed Better Auth types for `rememberMe`,
+  attempted to add the requested shadcn components through the installed CLI,
+  and continued with the existing shadcn token/component conventions when the
+  CLI registry was unavailable in the environment. Redesigned the shell,
+  responsive navigation, empty dashboard states, login form, and CSS/SVG
+  illustration without changing backend behavior.
+- Computed the palette contrast ratios with a local luminance calculation;
+  no ratio is presented as verified without that calculation.
