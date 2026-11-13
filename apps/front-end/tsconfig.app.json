@@ -19,7 +19,7 @@
 		/* Path aliases */
 		"paths": {
 			"@/*": ["./src/*"],
-			"@dspv2/shared": ["../../packages/shared/dist/index.d.ts", "../../packages/shared/dist/src/index.d.ts"]
+		"@dspv2/shared": ["../../packages/shared/src/index.ts"]
 		},
 
 		/* Linting */
@@ -28,6 +28,5 @@
 		"erasableSyntaxOnly": true,
 		"noFallthroughCasesInSwitch": true
 	},
-	"include": ["src"],
-	"references": [{ "path": "../../packages/shared" }]
+	"include": ["src"]
 }
