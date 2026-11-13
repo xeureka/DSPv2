@@ -1,4 +1,3 @@
-import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
 	CheckCircleIcon,
@@ -9,11 +8,9 @@ import {
 } from "@phosphor-icons/react";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-	const { theme = "system" } = useTheme();
-
 	return (
 		<Sonner
-			theme={theme as ToasterProps["theme"]}
+			theme="light"
 			className="toaster group"
 			icons={{
 				success: <CheckCircleIcon className="size-4" />,

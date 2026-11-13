@@ -83,9 +83,9 @@ and [SRS v2](docs/DispatchPilot_SRS_REVISED.pdf) for planned product scope.
 
 ## UI verification
 
-The dashboard and login layouts are responsive and include light/dark theme
-tokens, but screenshot verification is not recorded in this environment: no
-browser or screenshot runner was available, and the referenced
+The dashboard and login layouts use the light green theme. Screenshot
+verification is not recorded in this environment: no browser or screenshot
+runner was available, and the referenced
 `docs/design/reference-dashboard.png` file was not present.
 
 ### Google sign-in and password reset

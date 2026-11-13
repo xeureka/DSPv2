@@ -1,6 +1,5 @@
-import { Moon, Question, SignOut, Sun } from "@phosphor-icons/react";
+import { Question, SignOut } from "@phosphor-icons/react";
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import type { UserRole } from "@dspv2/shared";
 import {
@@ -176,7 +175,6 @@ function BottomTabs() {
 export function AppShell() {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { theme, setTheme } = useTheme();
 	const { data: session } = authClient.useSession();
 	const user = session?.user;
 	if (!user)
@@ -226,14 +224,6 @@ export function AppShell() {
 						<div className="flex items-center gap-1">
 							<Button variant="ghost" size="icon" aria-label="Help">
 								<Question size={19} />
-							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-								onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-							>
-								{theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}
 							</Button>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>

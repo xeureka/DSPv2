@@ -33,9 +33,13 @@
   `#4ADE80`. The first commit did not contain a complete green base palette;
   it supplied the emerald visual direction and restrained radius/surfaces,
   which are preserved here without restoring clinic UI.
+
 - The palette is defined once in `apps/front-end/src/styles/index.css` and
-  mapped to shadcn background, card, border, foreground, muted, primary,
-  accent, ring, chart, and sidebar tokens. Measured WCAG ratios are recorded
+	mapped to shadcn background, card, border, foreground, muted, primary,
+	accent, ring, chart, and sidebar tokens. DispatchPilot currently ships the
+	light palette only; dark-mode switching and dark tokens were intentionally
+	removed to keep the product's visual system exact and consistent.
+	Measured WCAG ratios are recorded
   in the cleanup/UI handoff report; status badges use their soft background
   and text-on-soft pair because white on teal or amber solids does not meet AA.
 - Navigation is a typed config filtered by existing route paths and role. The
@@ -66,7 +70,7 @@
 ## Login split layout decisions
 
 - The login screen uses a 50/50 desktop split: an always-dark green brand
-  panel with CSS/SVG glass job blocks and a theme-aware console form. Tablet
+	panel with CSS/SVG glass job blocks and a light console form. Tablet
   stacks the panel above the form; mobile keeps only the compact headline and
   live status row in the navy header.
 - The brand panel calls the existing public `/api/v1/ready` route on mount and

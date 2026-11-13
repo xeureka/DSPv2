@@ -5,13 +5,10 @@ import {
 	EyeSlash,
 	EnvelopeSimple,
 	LockKey,
-	Moon,
 	SpinnerGap,
-	Sun,
 } from "@phosphor-icons/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useTheme } from "next-themes";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "@/components/ui/alert";
@@ -27,20 +24,6 @@ import {
 } from "@/features/auth/password-reset-model";
 import { BrandPanel } from "@/features/auth/components/login-page";
 
-function ThemeToggle() {
-	const { resolvedTheme, setTheme } = useTheme();
-	return (
-		<Button
-			variant="ghost"
-			size="icon"
-			aria-label="Toggle theme"
-			onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-		>
-			{resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-		</Button>
-	);
-}
-
 function AuthFrame({
 	children,
 	title,
@@ -54,9 +37,6 @@ function AuthFrame({
 		<main className="grid min-h-[100svh] overflow-x-hidden bg-background lg:grid-cols-2">
 			<BrandPanel status="operational" />
 			<section className="relative flex min-h-[calc(100svh-260px)] flex-col px-5 py-5 sm:px-8 lg:min-h-[100svh] lg:px-12 lg:py-8 xl:px-20">
-				<div className="flex justify-end">
-					<ThemeToggle />
-				</div>
 				<div className="flex flex-1 items-center justify-center py-8">
 					<div className="w-full max-w-[450px] login-entrance">
 						<div className="mb-7">

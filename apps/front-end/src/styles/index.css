@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/jetbrains-mono";
 
+/* Keep generated shadcn dark variants inert: the product intentionally ships light-only UI. */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -102,52 +103,6 @@
 	--sidebar-accent-foreground: #123026;
 	--sidebar-border: #cfe8da;
 	--sidebar-ring: #16a34a;
-}
-
-.dark {
-	--background: #071a12;
-	--card: #0d2619;
-	--popover: #0d2619;
-	--border: #1c4a30;
-	--input: #1c4a30;
-	--foreground: #e8f5ec;
-	--card-foreground: #e8f5ec;
-	--popover-foreground: #e8f5ec;
-	--muted-foreground: #a5c7b0;
-	--primary: #4ade80;
-	--primary-foreground: #052e16;
-	--secondary: #123b25;
-	--secondary-foreground: #e8f5ec;
-	--muted: #123b25;
-	--accent: #4ade80;
-	--accent-foreground: #052e16;
-	--ring: #4ade80;
-	--destructive: #f87171;
-	--chart-1: #4ade80;
-	--chart-2: #2dd4bf;
-	--chart-3: #60a5fa;
-	--chart-4: #fbbf24;
-	--chart-5: #f87171;
-	--status-ok: #2dd4bf;
-	--status-ok-soft: #123a3a;
-	--status-ok-text: #8ce9dc;
-	--status-scheduled: #60a5fa;
-	--status-scheduled-soft: #172d55;
-	--status-scheduled-text: #b8d2ff;
-	--status-attention: #fbbf24;
-	--status-attention-soft: #493516;
-	--status-attention-text: #ffe0a0;
-	--status-late: #f87171;
-	--status-late-soft: #4b2028;
-	--status-late-text: #ffc1c1;
-	--sidebar: #0d2619;
-	--sidebar-foreground: #e8f5ec;
-	--sidebar-primary: #4ade80;
-	--sidebar-primary-foreground: #052e16;
-	--sidebar-accent: #123b25;
-	--sidebar-accent-foreground: #e8f5ec;
-	--sidebar-border: #1c4a30;
-	--sidebar-ring: #4ade80;
 }
 
 @layer base {

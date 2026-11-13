@@ -5,13 +5,10 @@ import {
 	Eye,
 	EyeSlash,
 	LockKey,
-	Moon,
 	SpinnerGap,
-	Sun,
 	Terminal,
 } from "@phosphor-icons/react";
 import { Navigate, useNavigate } from "@tanstack/react-router";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -182,7 +179,6 @@ export function BrandPanel({ status }: { status: SystemStatusState }) {
 
 export function LoginPage() {
 	const navigate = useNavigate();
-	const { resolvedTheme, setTheme } = useTheme();
 	const { data: session } = authClient.useSession();
 	const [showPassword, setShowPassword] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
@@ -277,18 +273,6 @@ export function LoginPage() {
 		<main className="grid min-h-[100svh] overflow-x-hidden bg-background lg:grid-cols-2">
 			<BrandPanel status={systemStatus} />
 			<section className="relative flex min-h-[calc(100svh-260px)] flex-col px-5 py-5 sm:px-8 lg:min-h-[100svh] lg:px-12 lg:py-8 xl:px-20">
-				<div className="flex justify-end">
-					<Button
-						variant="ghost"
-						size="icon"
-						aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} theme`}
-						onClick={() =>
-							setTheme(resolvedTheme === "dark" ? "light" : "dark")
-						}
-					>
-						{resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-					</Button>
-				</div>
 				<div className="flex flex-1 items-center justify-center py-8 sm:py-12">
 					<div className="w-full max-w-[450px] login-entrance">
 						<div className="mb-7">
