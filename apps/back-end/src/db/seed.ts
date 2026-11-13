@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "@/db";
+import { db, pool } from "@/db";
 import type { UserRole } from "@dspv2/shared";
 import { users } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -80,8 +80,10 @@ export async function seedStaffUsers() {
 }
 
 if (process.argv[1]?.endsWith("/seed.ts")) {
-	seedStaffUsers().catch(() => {
-		console.error("Seed failed; credential values were not logged.");
-		process.exitCode = 1;
-	});
+	seedStaffUsers()
+		.catch(() => {
+			console.error("Seed failed; credential values were not logged.");
+			process.exitCode = 1;
+		})
+		.finally(() => pool.end());
 }
