@@ -2,7 +2,6 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import dns from "node:dns";
 import { env } from "../lib/env";
-import { currentDatabase } from "./request-context";
 
 // Prefer IPv4 for Neon direct endpoints in local environments where the
 // advertised IPv6 route may be unreachable. This avoids wasting the whole
@@ -27,19 +26,9 @@ const pool = new Pool({
 	// after long-lived connections or schema changes
 });
 
-const baseDb = drizzle({
-	client: pool,
-});
 
-// Repositories keep importing `db`, while request middleware transparently
-// redirects those calls to the current transaction. This makes RLS context
-// apply to every query without duplicating transaction plumbing in services.
-export const db = new Proxy(baseDb, {
-	get(target, property, _receiver) {
-		const scoped = currentDatabase(target);
-		const value = Reflect.get(scoped, property, scoped);
-		return typeof value === "function" ? value.bind(scoped) : value;
-	},
+export const db = drizzle({
+	client: pool,
 });
 
 export { pool };

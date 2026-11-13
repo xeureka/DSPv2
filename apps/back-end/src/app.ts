@@ -17,14 +17,8 @@ import { auth } from "@/lib/auth";
 
 const app = new OpenAPIHono<AppEnv>();
 
-// Keep previously issued API-host login links usable while new provisioning
-// responses point directly at the web app. Only the tenant query parameter is
-// forwarded; the destination remains the configured web origin.
 app.get("/login", (c) => {
-	const target = new URL("/login", env.WEB_APP_URL);
-	const tenant = c.req.query("tenant");
-	if (tenant) target.searchParams.set("tenant", tenant);
-	return c.redirect(target.toString(), 302);
+	return c.redirect(new URL("/login", env.WEB_APP_URL).toString(), 302);
 });
 
 app.use("*", secureHeaders());

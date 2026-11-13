@@ -7,6 +7,7 @@ export const sessionMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
 
 	c.set("user", result?.user ?? null);
 	c.set("session", result?.session ?? null);
+	c.set("role", (result?.user?.role as AppEnv["Variables"]["role"]) ?? null);
 
 	await next();
 };

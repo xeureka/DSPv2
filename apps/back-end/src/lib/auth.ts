@@ -18,6 +18,14 @@ export const auth = betterAuth({
 	trustedOrigins: [env.WEB_APP_URL],
 	user: {
 		modelName: "users",
+		additionalFields: {
+			role: {
+				type: "string",
+				required: true,
+				input: false,
+				defaultValue: "technician",
+			},
+		},
 		fields: {
 			emailVerified: "emailVerified",
 		},
