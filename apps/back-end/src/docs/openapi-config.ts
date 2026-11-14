@@ -9,6 +9,10 @@ export const setupOpenAPI = (app: OpenAPIHono) => {
 			title: "DispatchPilot API",
 			description: "API documentation for DispatchPilot",
 		},
+		externalDocs: {
+			description: "Complete Better Auth endpoint schema",
+			url: "/api/auth/open-api/generate-schema",
+		},
 	});
 
 	app.get(

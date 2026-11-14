@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI } from "better-auth/plugins";
 
 import { db } from "@/db";
 import * as schema from "@/db/schema";
@@ -11,6 +12,13 @@ export const googleSignInConfigured = Boolean(
 );
 
 export const auth = betterAuth({
+	baseURL: env.BETTER_AUTH_URL,
+	plugins: [
+		openAPI({
+			disableDefaultReference: false,
+			theme: "purple",
+		}),
+	],
 	database: drizzleAdapter(db, {
 		provider: "pg",
 		schema: {

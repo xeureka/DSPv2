@@ -31,29 +31,32 @@ pnpm lint
 pnpm build
 ```
 
-Do not commit either `.env` file. Set `DATABASE_URL`, `TEST_DATABASE_URL`, the
-Better Auth URLs, and a 32-character `BETTER_AUTH_SECRET` in the backend
-environment. The frontend can use an empty `VITE_API_URL` during local
-development because Vite proxies `/api`.
+Do not commit either `.env` file. Set `DATABASE_URL`, the Better Auth URLs, and
+a 32-character `BETTER_AUTH_SECRET` in the backend environment. Use a
+non-production development database for local tests and seeding. The frontend
+can use an empty `VITE_API_URL` during local development because Vite proxies
+`/api`.
 
 The development seed reads these backend variables: `SEED_MANAGER_EMAIL`,
 `SEED_MANAGER_NAME`, `SEED_MANAGER_PASSWORD`, `SEED_DISPATCHER_EMAIL`,
 `SEED_DISPATCHER_NAME`, `SEED_DISPATCHER_PASSWORD`, `SEED_TECHNICIAN_EMAIL`,
-`SEED_TECHNICIAN_NAME`, and `SEED_TECHNICIAN_PASSWORD`. Auth integration tests
-also require `TEST_AUTH_EMAIL` and `TEST_AUTH_PASSWORD`.
+`SEED_TECHNICIAN_NAME`, and `SEED_TECHNICIAN_PASSWORD`. If the seed variables
+are omitted, the seed uses the default credentials documented below.
 
-Database changes are tracked in `apps/back-end/drizzle`. Confirm that the test
-URL points to a disposable database different from `DATABASE_URL` before using
-it. Run migrations and seeds only against the intended test database:
+Database changes are tracked in `apps/back-end/drizzle`. Run migrations and
+seeds only against the intended development database:
 
 ```bash
-DATABASE_URL="$TEST_DATABASE_URL" pnpm --filter @dspv2/backend db:migrate
-DATABASE_URL="$TEST_DATABASE_URL" pnpm --filter @dspv2/backend seed
+pnpm --filter @dspv2/backend db:migrate
+pnpm --filter @dspv2/backend seed
 ```
 
 The seed creates exactly one Better Auth credential user for each of the three
-roles and is idempotent. It never changes an existing password. Never run it
-against production.
+roles and is idempotent. By default, the accounts are
+`manager@dispatchpilot.local` / `DispatchPilotManager123!`,
+`dispatcher@dispatchpilot.local` / `DispatchPilotDispatcher123!`, and
+`technician@dispatchpilot.local` / `DispatchPilotTechnician123!`. It never
+changes an existing password. Never run it against production.
 
 The frontend currently uses deterministic demo data. Set
 `VITE_USE_MOCK_DATA=false` when wiring the future API adapter; until that

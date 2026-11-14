@@ -65,7 +65,49 @@
   `local:credential` issuer. No organization or member tables are enabled.
 - The seed reads every user email, name, and password from environment
   variables, repairs only a missing credential account, and never overwrites
-  an existing password. Verification runs only against `TEST_DATABASE_URL`.
+  an existing password. Verification runs against the configured
+  `DATABASE_URL`, which must point to a non-production development database.
+
+## Backend foundation decisions
+
+- Phase B0 uses one tracked Drizzle migration for the DispatchPilot domain
+  tables: buildings, technicians, skills, contracts, SLA rules, assets, jobs,
+  assignments, asset events, duration statistics, events, plan proposals,
+  approvals, outbox, settings, and simulation runs. Better Auth remains on its
+  existing four tables.
+- The B0 seed uses stable UUIDs for domain fixtures and is idempotent through
+  conflict-safe inserts. It creates safe defaults for auto-pilot off,
+  confidence threshold 0.8, and dry-run on.
+- The event store accepts a transaction executor so a domain state mutation and
+  its append-only event can commit or roll back together. Idempotency keys are
+  unique at the database layer.
+- External integrations begin behind fallback-only ports: haversine travel
+  time, seeded geocoding, dry-run mail, and rule-based extraction. Real
+  providers can be added without changing domain services.
+
+- Contract PDFs are stored in `CONTRACT_UPLOAD_DIR` with generated filenames
+  and mode `0600`; extracted rules remain a draft until manager approval.
+  This keeps contract text private and prevents unclear or injected clauses
+  from becoming active SLA rules.
+- The benchmark CLI is pure and seeded. It prints labelled `simulated=true`
+  results; API runs persist comparable rows in `simulation_runs`. It does not
+  claim production performance or edit measured output.
+
+## Phase B1 API decisions
+
+- B1 keeps the simple assignment baseline behind `CoreService.reassignJob`.
+  Eligible technicians must have the required skill, be available, be inside
+  their configured UTC shift, and are ranked by haversine distance from the
+  job. Technician coordinates are persisted so this baseline remains
+  deterministic and replaceable by the planner in B3.
+- Job workflow transitions are enforced in the service layer. The legacy
+  `open`, `scheduled`, and `attention` values remain readable for seeded or
+  older rows, while new intake uses `received` through `done` (or
+  `cancelled`). Invalid transitions return `INVALID_TRANSITION`.
+- B1 list endpoints use timestamp cursors and compute board KPIs and SLA
+  compliance from current rows rather than storing aggregates. Mutations use
+  the event transaction helper, and repeated approval/status/idempotency
+  operations are safe to retry.
 
 - Contract PDFs are stored in `CONTRACT_UPLOAD_DIR` with generated filenames
   and mode `0600`; extracted rules remain a draft until manager approval.
