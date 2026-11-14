@@ -31,6 +31,7 @@ export const envSchema = z.object({
 	GEMINI_CALL_BUDGET: z.coerce.number().int().positive().default(3),
 	SCHEDULER_SECRET: z.string().optional(),
 	DEMO_MODE: z.preprocess((value) => typeof value === "string" ? value.toLowerCase() === "true" : value, z.boolean().default(false)),
+	CONTRACT_UPLOAD_DIR: z.string().default("./var/private-contracts"),
 	LOG_LEVEL: z
 		.enum(["trace", "debug", "info", "warn", "error", "fatal"])
 		.default("info"),

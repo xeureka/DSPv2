@@ -12,6 +12,7 @@ import contracts from "./contracts";
 import simulations from "./simulations";
 import assets from "./assets";
 import stream from "./stream";
+import contractUpload from "./contract-upload";
 
 const v1 = new OpenAPIHono<AppEnv>();
 
@@ -27,5 +28,6 @@ v1.route("/", contracts);
 v1.route("/", simulations);
 v1.route("/", assets);
 v1.route("/", stream);
+v1.route("/", contractUpload);
 
 export default v1;

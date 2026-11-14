@@ -11,7 +11,9 @@
 		"lint": "pnpm --filter @dspv2/shared lint && pnpm --filter @dspv2/backend lint && pnpm --filter @dspv2/frontend lint",
 		"format": "pnpm --filter @dspv2/shared format && pnpm --filter @dspv2/backend format && pnpm --filter @dspv2/frontend format",
 		"format:check": "pnpm --filter @dspv2/shared format:check && pnpm --filter @dspv2/backend format:check && pnpm --filter @dspv2/frontend format:check",
-		"test": "pnpm --filter @dspv2/backend test && pnpm --filter @dspv2/frontend test"
+		"test": "pnpm --filter @dspv2/backend test && pnpm --filter @dspv2/frontend test",
+		"eval": "pnpm --filter @dspv2/backend exec tsx ../../eval/run.ts",
+		"sim": "pnpm --filter @dspv2/engine exec tsx ../../sim/cli.ts"
 	},
 	"engines": {
 		"node": ">=24 <25",

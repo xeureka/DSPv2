@@ -5,12 +5,9 @@ import { db } from "@/db";
 import { approvals, buildings, contracts, slaRules, jobs } from "@/db/schema";
 import { appendEvent, withEventTransaction } from "@/events/event-store";
 import { coreService } from "@/services/core.service";
+import { detectPromptInjection, scanSafety } from "@/adapters/safety";
 
-export const safetyPattern = /trapped|stuck in (a )?(lift|elevator)|entrapment|smoke|fire|gas leak|flooding|injur(y|ed)/i;
-export const injectionPattern = /ignore (all|any|the) previous|system message|developer message|assign to [A-Za-z]|mark (this|it) resolved|send (me|the) secrets|password|api key|exfiltrat/i;
-
-export function scanSafety(text: string) { return safetyPattern.test(text); }
-export function detectPromptInjection(text: string) { return injectionPattern.test(text); }
+export { detectPromptInjection, scanSafety };
 
 async function resolveBuilding(buildingId: string | undefined, locationText: string, message: string) {
 	const rows = await db.select().from(buildings).orderBy(asc(buildings.createdAt));

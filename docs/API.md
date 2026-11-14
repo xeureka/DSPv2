@@ -54,4 +54,11 @@ The backend exposes the live workflows under `/api/v1`:
 - `POST /internal/tick` with `x-scheduler-secret`
 - `GET /stream` for authenticated SSE updates with `Last-Event-ID` resume
 
+- `POST /contracts/upload` accepts a multipart PDF with `file`, `buildingId`,
+  and optional `tier`/`customer`. It creates a pending contract draft and an
+  approval item; it never activates extracted rules automatically.
+- `pnpm eval` runs the 30-message labelled fallback evaluation and 12-case
+  injection suite. `pnpm sim run --days 100 --seed 42 --scenario all` runs the
+  reproducible benchmark table.
+
 The frontend uses these routes by default. Set `VITE_USE_MOCK_DATA=true` only for the explicitly labelled demo adapter.

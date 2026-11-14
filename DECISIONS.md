@@ -67,6 +67,14 @@
   variables, repairs only a missing credential account, and never overwrites
   an existing password. Verification runs only against `TEST_DATABASE_URL`.
 
+- Contract PDFs are stored in `CONTRACT_UPLOAD_DIR` with generated filenames
+  and mode `0600`; extracted rules remain a draft until manager approval.
+  This keeps contract text private and prevents unclear or injected clauses
+  from becoming active SLA rules.
+- The benchmark CLI is pure and seeded. It prints labelled `simulated=true`
+  results; API runs persist comparable rows in `simulation_runs`. It does not
+  claim production performance or edit measured output.
+
 ## Phase B1 API decisions
 
 - B1 keeps the simple assignment baseline behind `CoreService.reassignJob`.
