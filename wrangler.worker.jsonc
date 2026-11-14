@@ -1,0 +1,11 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "dispatchpilot-api",
+	"main": "apps/back-end/src/worker.ts",
+	"compatibility_date": "2026-11-14",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": { "enabled": true },
+	// Uncomment after creating the bucket with:
+	// wrangler r2 bucket create dispatchpilot-contracts
+	// "r2_buckets": [{ "binding": "CONTRACT_BUCKET", "bucket_name": "dispatchpilot-contracts" }]
+}

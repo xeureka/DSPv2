@@ -1,5 +1,3 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import crypto from "node:crypto";
 import { eq } from "drizzle-orm";
 import { contractRulesDraftSchema, type ContractRulesDraft } from "@dspv2/shared";
 import { db } from "@/db";
@@ -13,6 +11,21 @@ import { ErrorCode } from "@/lib/errors/error-codes";
 const MAX_PDF_BYTES = 10 * 1024 * 1024;
 function textFromPdf(buffer: Buffer) { return buffer.toString("latin1").replaceAll(/\\(n|r|t)/g, " ").replaceAll(/[^\x20-\x7E\n]+/g, " ").replaceAll(/\s+/g, " ").slice(0, 100_000); }
 
+type ContractBucket = {
+	put(key: string, value: ArrayBuffer | Uint8Array, options?: { httpMetadata?: { contentType: string } }): Promise<unknown>;
+};
+
+async function storeContractPdf(fileName: string, bytes: Buffer) {
+	const bucket = (globalThis as typeof globalThis & { __DISPATCHPILOT_CONTRACT_BUCKET__?: ContractBucket }).__DISPATCHPILOT_CONTRACT_BUCKET__;
+	if (bucket) {
+		await bucket.put(fileName, bytes, { httpMetadata: { contentType: "application/pdf" } });
+		return;
+	}
+	const { mkdir, writeFile } = await import("node:fs/promises");
+	await mkdir(env.CONTRACT_UPLOAD_DIR, { recursive: true });
+	await writeFile(`${env.CONTRACT_UPLOAD_DIR}/${fileName}`, bytes, { mode: 0o600 });
+}
+
 export class ContractUploadService {
 	async upload(input: { file: File; buildingId: string; customer?: string; tier?: "gold" | "silver" | "bronze" }) {
 		if (input.file.type !== "application/pdf") throw new AppError("Only PDF contracts are supported", 400, ErrorCode.BAD_REQUEST);
@@ -25,8 +38,7 @@ export class ContractUploadService {
 		const rule = extracted.value.rules[0];
 		if (!rule) throw new AppError("Contract extraction produced no rules", 422, ErrorCode.VALIDATION_ERROR);
 		const fileName = `${crypto.randomUUID()}.pdf`;
-		await mkdir(env.CONTRACT_UPLOAD_DIR, { recursive: true });
-		await writeFile(`${env.CONTRACT_UPLOAD_DIR}/${fileName}`, bytes, { mode: 0o600 });
+		await storeContractPdf(fileName, bytes);
 		return withEventTransaction(async (tx) => {
 			const [contract] = await tx.insert(contracts).values({ buildingId: building.id, customer: input.customer ?? building.customer, sourcePdf: fileName, tier: input.tier ?? rule.tier, status: "pending_approval" }).returning();
 			if (!contract) throw new AppError("Contract creation failed", 500, ErrorCode.INTERNAL_SERVER_ERROR);

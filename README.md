@@ -188,11 +188,43 @@ Simulation output is labelled `simulated=true` and must be interpreted as seeded
 
 Outbound messages are dry-run by default. Contract rules remain drafts until a manager approves them. Re-plans remain proposals unless the auto-pilot setting is explicitly enabled.
 
+## Cloudflare Deployment
+
+The dashboard deploys to Cloudflare Pages and the Hono API has a Cloudflare Workers entry point using Node compatibility. The API uses the same PostgreSQL/Neon connection through the `DATABASE_URL` Worker secret; Hyperdrive can be added later for connection pooling. Do not upload a `.env` file: put each value into Cloudflare as a secret or variable.
+
+Create the Pages project, set the frontend API origin for the build, and deploy:
+
+```sh
+pnpm dlx wrangler@latest pages project create dispatchpilot-web
+VITE_API_URL=https://dispatchpilot-api.<your-subdomain>.workers.dev pnpm cloudflare:build
+pnpm dlx wrangler@latest pages deploy apps/front-end/dist --project-name dispatchpilot-web --config wrangler.pages.jsonc
+```
+
+Deploy the API Worker after adding its secrets through the terminal:
+
+```sh
+printf '%s' "$DATABASE_URL" | pnpm dlx wrangler@latest secret put DATABASE_URL --config wrangler.worker.jsonc
+printf '%s' "$BETTER_AUTH_SECRET" | pnpm dlx wrangler@latest secret put BETTER_AUTH_SECRET --config wrangler.worker.jsonc
+printf '%s' "$BETTER_AUTH_URL" | pnpm dlx wrangler@latest secret put BETTER_AUTH_URL --config wrangler.worker.jsonc
+printf '%s' "$WEB_APP_URL" | pnpm dlx wrangler@latest secret put WEB_APP_URL --config wrangler.worker.jsonc
+printf '%s' "$CORS_ORIGINS" | pnpm dlx wrangler@latest secret put CORS_ORIGINS --config wrangler.worker.jsonc
+printf '%s' "$GEMINI_API_KEY" | pnpm dlx wrangler@latest secret put GEMINI_API_KEY --config wrangler.worker.jsonc
+pnpm cloudflare:api:deploy
+```
+
+Set non-secret Worker variables with `wrangler.toml`/`wrangler.jsonc` or the Cloudflare dashboard, including `NODE_ENV=production`, `DRY_RUN=true`, `GEMINI_MODEL`, `SCHEDULER_SECRET`, and `CONTRACT_UPLOAD_DIR`. Run database migrations against the production `DATABASE_URL` before the first Worker request. Never run the local `pnpm dev` seed flow with `NODE_ENV=production`.
+
+For contract PDF uploads on Workers, create an R2 bucket and uncomment the `r2_buckets` binding in [`wrangler.worker.jsonc`](wrangler.worker.jsonc):
+
+```sh
+pnpm dlx wrangler@latest r2 bucket create dispatchpilot-contracts
+```
+
 ## Roadmap
 
 The following integrations are intentionally left behind adapter boundaries or require environment-specific setup:
 
-- **Production deployment** — Cloud Run, Neon, and Cloud Scheduler configuration
+- **Cloud Scheduler integration** — trigger the Worker tick, nightly, and daily endpoints on a schedule
 - **Live email delivery** — Gmail or another provider after the dry-run outbox is approved
 - **OSRM routing** — richer road travel times and route geometry beyond the haversine fallback
 - **Calendar and weather integrations** — optional Google Calendar and weather surge signals

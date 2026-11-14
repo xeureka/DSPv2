@@ -3,7 +3,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "pnpm --parallel --filter @dspv2/backend --filter @dspv2/frontend dev",
+		"dev": "pnpm dev:prepare && pnpm --parallel --filter @dspv2/backend --filter @dspv2/frontend dev",
+		"dev:prepare": "node scripts/dev-prepare.mjs",
 		"dev:frontend": "pnpm --filter @dspv2/frontend dev",
 		"dev:backend": "pnpm --filter @dspv2/backend dev",
 		"build": "pnpm --filter @dspv2/backend build && pnpm --filter @dspv2/frontend build",
@@ -13,7 +14,10 @@
 		"format:check": "pnpm --filter @dspv2/shared format:check && pnpm --filter @dspv2/backend format:check && pnpm --filter @dspv2/frontend format:check",
 		"test": "pnpm --filter @dspv2/backend test && pnpm --filter @dspv2/frontend test",
 		"eval": "pnpm --filter @dspv2/backend exec tsx ../../eval/run.ts",
-		"sim": "pnpm --filter @dspv2/engine exec tsx ../../sim/cli.ts"
+		"sim": "pnpm --filter @dspv2/engine exec tsx ../../sim/cli.ts",
+		"cloudflare:build": "pnpm --filter @dspv2/frontend build",
+		"cloudflare:deploy": "pnpm cloudflare:build && pnpm dlx wrangler@latest pages deploy apps/front-end/dist --project-name dispatchpilot-web --config wrangler.pages.jsonc",
+		"cloudflare:api:deploy": "pnpm dlx wrangler@latest deploy --config wrangler.worker.jsonc"
 	},
 	"engines": {
 		"node": ">=24 <25",

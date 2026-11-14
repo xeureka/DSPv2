@@ -29,6 +29,16 @@ const statusCopy: Record<
 	unreachable: { label: "UNREACHABLE", className: "text-status-late" },
 };
 
+const demoCredentials = [
+	{ role: "Manager", email: "manager@dispatchpilot.local", password: "DispatchPilotManager123!" },
+	{ role: "Dispatcher", email: "dispatcher@dispatchpilot.local", password: "DispatchPilotDispatcher123!" },
+	{ role: "Technician", email: "technician@dispatchpilot.local", password: "DispatchPilotTechnician123!" },
+] as const;
+
+const showDemoCredentials =
+	import.meta.env.DEV &&
+	(import.meta.env.VITE_SHOW_DEMO_CREDENTIALS as string | undefined) !== "false";
+
 function StatusReadout({ status }: { status: SystemStatusState }) {
 	const copy = statusCopy[status];
 	return (
@@ -338,6 +348,22 @@ export function LoginPage() {
 							)}
 						</Button>
 					</form>
+
+				{showDemoCredentials ? (
+					<aside className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950" aria-label="Development demo credentials">
+						<p className="font-semibold">Development demo accounts</p>
+						<p className="mt-1 text-amber-900/80">Visible only in Vite development mode. Do not use these accounts in production.</p>
+						<div className="mt-3 space-y-2 font-mono">
+							{demoCredentials.map((credential) => (
+								<div key={credential.role} className="rounded border border-amber-200 bg-white/70 p-2">
+									<p className="font-sans font-semibold">{credential.role}</p>
+									<p>{credential.email}</p>
+									<p>{credential.password}</p>
+								</div>
+							))}
+						</div>
+					</aside>
+				) : null}
 
 					<div className="my-7 flex items-center gap-3 text-xs text-muted-foreground">
 						<span className="h-px flex-1 bg-border" />

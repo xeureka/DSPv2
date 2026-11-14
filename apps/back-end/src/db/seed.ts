@@ -446,6 +446,10 @@ export async function seedDomainData() {
 }
 
 if (process.argv[1]?.endsWith("/seed.ts")) {
+	if (process.env.NODE_ENV === "production") {
+		console.error("Refusing to seed a production database.");
+		process.exitCode = 1;
+	} else {
 	seedStaffUsers()
 		.then(seedDomainData)
 		.catch(() => {
@@ -453,4 +457,5 @@ if (process.argv[1]?.endsWith("/seed.ts")) {
 			process.exitCode = 1;
 		})
 		.finally(() => pool.end());
+	}
 }

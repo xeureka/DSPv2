@@ -1,5 +1,4 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { getConnInfo } from "@hono/node-server/conninfo";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import { bodyLimit } from "hono/body-limit";
@@ -50,21 +49,12 @@ app.use("*", bodyLimit({ maxSize: 12 * 1024 * 1024 }));
 app.use("*", requestId());
 
 const getClientIp = (c: any) => {
-	try {
-		const info = getConnInfo(c);
-		return (
-			info?.remote?.address ||
-			c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
-			c.req.header("x-real-ip") ||
-			"127.0.0.1"
-		);
-	} catch {
-		return (
-			c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
-			c.req.header("x-real-ip") ||
-			"127.0.0.1"
-		);
-	}
+	return (
+		c.req.header("cf-connecting-ip") ||
+		c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
+		c.req.header("x-real-ip") ||
+		"127.0.0.1"
+	);
 };
 
 const isDev = env.NODE_ENV === "development" || env.NODE_ENV === "test";
