@@ -8,6 +8,7 @@ import { requireRole } from "@/middlewares/require-role.middleware";
 import { sessionMiddleware } from "@/middlewares/session.middleware";
 import type { AppEnv } from "@/types/hono";
 import { successResponse } from "@/utils/api-response";
+import { planService } from "@/services/plan.service";
 
 const anyResponse = z.object({ success: z.literal(true), data: z.any() });
 const idParams = z.object({ id: z.string().uuid() });
@@ -253,14 +254,15 @@ core.openapi(
 		const id = c.req.valid("param").id;
 		if (user.role === "technician" && own?.technician.id !== id)
 			throw new AppError("Insufficient role", 403, ErrorCode.FORBIDDEN);
-		return successResponse(
-			c,
-			await coreService.statusTechnician(
-				id,
-				c.req.valid("json").status,
-				c.req.valid("json").minutes,
-			),
+		const result = await coreService.statusTechnician(
+			c.req.valid("param").id,
+			c.req.valid("json").status,
+			c.req.valid("json").minutes,
 		);
+		const proposal = c.req.valid("json").status === "running_late"
+			? await planService.createDelayProposal(c.req.valid("param").id, c.req.valid("json").minutes ?? 0, user.id)
+			: null;
+		return successResponse(c, { ...result, proposal });
 	},
 );
 

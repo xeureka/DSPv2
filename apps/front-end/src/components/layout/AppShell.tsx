@@ -31,7 +31,27 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import { USE_MOCK_DATA } from "@/lib/env";
+import { API_BASE_URL, USE_MOCK_DATA } from "@/lib/env";
+import { queryClient } from "@/lib/query";
+
+function LiveUpdates() {
+	useEffect(() => {
+		if (USE_MOCK_DATA || typeof window === "undefined") return;
+		const source = new EventSource(`${API_BASE_URL}/api/v1/stream`, { withCredentials: true });
+		const refresh = () => {
+			void queryClient.invalidateQueries({ queryKey: ["jobs"] });
+			void queryClient.invalidateQueries({ queryKey: ["approvals"] });
+			void queryClient.invalidateQueries({ queryKey: ["events"] });
+			void queryClient.invalidateQueries({ queryKey: ["technicians"] });
+		};
+		source.addEventListener("job", refresh);
+		source.addEventListener("plan_proposal", refresh);
+		source.addEventListener("approval", refresh);
+		source.addEventListener("technician", refresh);
+		return () => source.close();
+	}, []);
+	return null;
+}
 
 function roleLabel(role: UserRole | undefined) {
 	return role ? role.charAt(0).toUpperCase() + role.slice(1) : "Staff";
@@ -304,6 +324,7 @@ export function AppShell() {
 			?.label ?? (role === "technician" ? "My Jobs" : "Dispatch Board");
 	return (
 		<SidebarProvider>
+			<LiveUpdates />
 			<div className="flex min-h-screen w-full overflow-x-hidden bg-background text-foreground">
 				<ShellSidebar />
 				<MobileNavigation />

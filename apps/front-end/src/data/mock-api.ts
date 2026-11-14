@@ -57,6 +57,16 @@ export const mockApi = {
 		if (item) item.status = "approved";
 		return item;
 	},
+	async approveContract(id: string) {
+		await wait(220);
+		const contract = mockDb.contracts.find((item) => item.id === id);
+		if (contract) contract.status = "Active";
+		return contract;
+	},
+	async runSimulation(input: { days: number; seed: number; scenario: SimulationRun["scenario"] }) {
+		await wait(320);
+		return mockDb.simulationRuns.find((item) => item.scenario === input.scenario);
+	},
 };
 
 export type MockData = {

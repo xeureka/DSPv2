@@ -42,3 +42,16 @@ Generate or apply database changes from apps/back-end:
 pnpm db:generate
 pnpm db:migrate
 pnpm seed
+## Phase B endpoints
+
+The backend exposes the live workflows under `/api/v1`:
+
+- `POST /intake/messages` and `POST /intake/command`
+- `GET /plans/proposals`, `GET /plans/proposals/:id`, and proposal approve/reject
+- `POST /contracts/:id/approve` and `GET /sla/evidence-pack`
+- `POST /simulations/run`, `POST /simulations/what-if`, and `GET /simulations`
+- `POST /assets/:id/callback` and `POST /assets/:id/inspection`
+- `POST /internal/tick` with `x-scheduler-secret`
+- `GET /stream` for authenticated SSE updates with `Last-Event-ID` resume
+
+The frontend uses these routes by default. Set `VITE_USE_MOCK_DATA=true` only for the explicitly labelled demo adapter.
