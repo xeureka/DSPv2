@@ -233,7 +233,3 @@ The following integrations are intentionally left behind adapter boundaries or r
 The core workflow, fallback path, planner, approvals, evidence trail, simulator, and frontend API integration are implemented locally and covered by the repository checks.
 
 ---
-
-## License
-
-No license file has been added to this repository yet. Add the project license before distributing it as an open-source package.
