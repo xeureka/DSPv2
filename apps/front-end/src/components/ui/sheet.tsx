@@ -18,7 +18,7 @@ export function Sheet({
 				className="absolute inset-0 bg-foreground/40"
 				onClick={() => onOpenChange(false)}
 			/>
-			<div className="relative h-full w-[min(19rem,85vw)] bg-sidebar p-4 shadow-xl">
+			<div className="relative h-full w-[min(19rem,85vw)] border-r border-sidebar-border bg-sidebar p-4">
 				<button
 					aria-label="Close navigation"
 					className="absolute right-3 top-3 rounded-md p-2 text-sidebar-foreground hover:bg-sidebar-accent"

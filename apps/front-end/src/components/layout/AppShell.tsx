@@ -89,7 +89,7 @@ function NavItem({
 				to={item.route as never}
 				onClick={onNavigate}
 				aria-current={active ? "page" : undefined}
-				className={`group flex min-h-10 items-center gap-3 rounded-[10px] px-3 text-sm font-medium text-sidebar-foreground transition-colors duration-150 hover:bg-sidebar-hover hover:text-sidebar-hover-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring active:bg-sidebar-pressed ${active ? "bg-sidebar-active text-sidebar-active-foreground font-semibold" : ""}`}
+				className={`group flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-sidebar-foreground transition-colors duration-150 hover:bg-sidebar-hover hover:text-sidebar-hover-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring active:bg-sidebar-pressed ${collapsed ? "justify-center px-0" : ""} ${active ? "bg-sidebar-active text-sidebar-active-foreground font-semibold" : ""}`}
 			>
 				<span className="relative flex size-5 shrink-0 items-center justify-center">
 					<Icon
@@ -145,16 +145,11 @@ function ShellSidebar() {
 	};
 	return (
 		<Sidebar>
-			<SidebarHeader className="group">
-				<div className="relative flex min-w-0 items-center">
-					<Brand compact={collapsed} />
-					{collapsed ? (
-						<span className="pointer-events-none absolute left-0 hidden group-hover:flex group-focus-within:flex">
-							<SidebarToggle />
-						</span>
-					) : null}
-				</div>
-				{!collapsed ? <SidebarToggle /> : null}
+			<SidebarHeader
+				className={collapsed ? "flex-col justify-center gap-2 py-3" : "gap-2"}
+			>
+				<Brand compact={collapsed} />
+				<SidebarToggle />
 			</SidebarHeader>
 			<SidebarContent>
 				<Navigation />
@@ -165,7 +160,7 @@ function ShellSidebar() {
 						<DropdownMenuTrigger asChild>
 							<Button
 								variant="ghost"
-								className={`min-h-10 w-full justify-start gap-3 px-3 text-sidebar-foreground hover:bg-sidebar-hover ${collapsed ? "justify-center px-0" : ""}`}
+								className={`min-h-10 w-full justify-start gap-3 rounded-lg px-3 text-sidebar-foreground hover:bg-sidebar-hover ${collapsed ? "justify-center px-0" : ""}`}
 							>
 								<Avatar className="size-7 shrink-0 text-[10px]">
 									{user?.name?.slice(0, 1).toUpperCase() || "U"}
@@ -173,8 +168,13 @@ function ShellSidebar() {
 								{collapsed ? (
 									<span className="sr-only">Account</span>
 								) : (
-									<span className="min-w-0 truncate text-left text-xs">
-										{user?.name || user?.email}
+									<span className="min-w-0 truncate text-left">
+										<strong className="block truncate text-xs font-medium">
+											{user?.name || user?.email}
+										</strong>
+										<span className="block truncate text-[10px] text-muted-foreground">
+											{roleLabel(role)}
+										</span>
 									</span>
 								)}
 							</Button>
@@ -190,7 +190,7 @@ function ShellSidebar() {
 					</DropdownMenu>
 					<Button
 						variant="ghost"
-						className={`min-h-10 w-full justify-start gap-3 px-3 text-sidebar-foreground hover:bg-sidebar-hover ${collapsed ? "justify-center px-0" : ""}`}
+						className={`min-h-10 w-full justify-start gap-3 rounded-lg px-3 text-sidebar-foreground hover:bg-sidebar-hover ${collapsed ? "justify-center px-0" : ""}`}
 					>
 						<Question size={20} />
 						{collapsed ? <span className="sr-only">Help</span> : "Help"}
@@ -204,6 +204,13 @@ function ShellSidebar() {
 
 function MobileNavigation() {
 	const { setMobileOpen } = useSidebar();
+	const { data: session } = authClient.useSession();
+	const user = session?.user;
+	const role = (user as { role?: UserRole } | undefined)?.role;
+	const handleSignOut = async () => {
+		await authClient.signOut();
+		window.location.assign("/login");
+	};
 	useEffect(() => {
 		const open = () => setMobileOpen(true);
 		window.addEventListener("dispatchpilot:open-mobile-nav", open);
@@ -212,13 +219,43 @@ function MobileNavigation() {
 	}, [setMobileOpen]);
 	return (
 		<MobileSidebar>
-			<div className="flex h-full flex-col pt-2">
+			<div className="flex h-full min-h-0 flex-col pt-2">
 				<div className="px-2">
 					<Brand />
 				</div>
 				<Separator className="my-5 bg-sidebar-border" />
-				<div className="overflow-y-auto px-2">
+				<div className="min-h-0 flex-1 overflow-y-auto px-2">
 					<Navigation mobile />
+				</div>
+				<div className="shrink-0 border-t border-sidebar-border px-2 pt-3">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="ghost"
+								className="min-h-10 w-full justify-start gap-3 rounded-lg px-3 text-sidebar-foreground hover:bg-sidebar-hover"
+							>
+								<Avatar className="size-7 shrink-0 text-[10px]">
+									{user?.name?.slice(0, 1).toUpperCase() || "U"}
+								</Avatar>
+								<span className="min-w-0 truncate text-left">
+									<strong className="block truncate text-xs font-medium">
+										{user?.name || user?.email}
+									</strong>
+									<span className="block truncate text-[10px] text-muted-foreground">
+										{roleLabel(role)}
+									</span>
+								</span>
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="start">
+							<DropdownMenuItem disabled>
+								{roleLabel(role)} · {user?.email}
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={handleSignOut}>
+								<SignOut size={16} /> Sign out
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 		</MobileSidebar>
@@ -292,7 +329,7 @@ export function AppShell() {
 				<ShellSidebar />
 				<MobileNavigation />
 				<div className="flex min-w-0 flex-1 flex-col">
-					<header className="sticky top-0 z-30 flex min-h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur sm:px-6">
+					<header className="sticky top-0 z-30 flex min-h-14 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
 						<div className="flex min-w-0 items-center gap-3">
 							<div className="md:hidden">
 								<SidebarToggle mobile />

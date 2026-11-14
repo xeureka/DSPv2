@@ -1,37 +1,23 @@
-import {
-	ArrowRight,
-	Circle,
-	EnvelopeSimple,
-	Eye,
-	EyeSlash,
-	LockKey,
-	SpinnerGap,
-	Terminal,
-} from "@phosphor-icons/react";
+import { Eye, EyeSlash, SpinnerGap, Terminal } from "@phosphor-icons/react";
 import { Navigate, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import { Link } from "@tanstack/react-router";
 import { TypewriterDispatch } from "@/features/auth/components/typewriter-dispatch";
+import { DispatchOperationsVisual } from "@/features/auth/components/dispatch-workflow-animation";
 import {
 	loginSchema,
 	passwordInputType,
 	signInPayload,
 	type LoginFormValues,
 } from "@/features/auth/login-model";
-import {
-	fetchSystemStatus,
-	type SystemStatusState,
-} from "@/features/auth/system-status";
+import type { SystemStatusState } from "@/features/auth/system-status";
 
 const statusCopy: Record<
 	SystemStatusState,
@@ -49,7 +35,7 @@ function StatusReadout({ status }: { status: SystemStatusState }) {
 		<div className="flex items-center justify-between gap-4">
 			<span className="text-white/55">SYSTEM_STATUS</span>
 			<span className={`flex items-center gap-2 ${copy.className}`}>
-				<Circle weight="fill" size={8} aria-hidden="true" />
+				<span className="size-2 rounded-full bg-current" aria-hidden="true" />
 				{copy.label}
 			</span>
 		</div>
@@ -184,10 +170,6 @@ export function LoginPage() {
 	const [submitting, setSubmitting] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [apiError, setApiError] = useState<string | null>(null);
-	const [googleEnabled, setGoogleEnabled] = useState(false);
-	const [googleChecked, setGoogleChecked] = useState(false);
-	const [systemStatus, setSystemStatus] =
-		useState<SystemStatusState>("loading");
 	const {
 		register,
 		handleSubmit,
@@ -197,37 +179,6 @@ export function LoginPage() {
 		mode: "onBlur",
 		defaultValues: { rememberMe: true },
 	});
-
-	useEffect(() => {
-		let cancelled = false;
-		const checkStatus = async () => {
-			const nextStatus = await fetchSystemStatus(() =>
-				api.get<{ status: string }>("/ready"),
-			);
-			if (!cancelled) setSystemStatus(nextStatus);
-		};
-		void checkStatus();
-		const interval = window.setInterval(() => {
-			if (document.visibilityState === "visible") void checkStatus();
-		}, 60_000);
-		const handleVisibility = () => {
-			if (document.visibilityState === "visible") void checkStatus();
-		};
-		document.addEventListener("visibilitychange", handleVisibility);
-		return () => {
-			cancelled = true;
-			window.clearInterval(interval);
-			document.removeEventListener("visibilitychange", handleVisibility);
-		};
-	}, []);
-
-	useEffect(() => {
-		void api
-			.get<{ googleEnabled: boolean }>("/auth/config")
-			.then((config) => setGoogleEnabled(config.googleEnabled))
-			.catch(() => setGoogleEnabled(false))
-			.finally(() => setGoogleChecked(true));
-	}, []);
 
 	if (session?.user) return <Navigate to="/" replace />;
 
@@ -256,7 +207,6 @@ export function LoginPage() {
 	};
 
 	const signInWithGoogle = async () => {
-		if (!googleEnabled) return;
 		setApiError(null);
 		const result = await authClient.signIn.social({
 			provider: "google",
@@ -270,191 +220,158 @@ export function LoginPage() {
 	};
 
 	return (
-		<main className="grid min-h-[100svh] overflow-x-hidden bg-background lg:grid-cols-2">
-			<BrandPanel status={systemStatus} />
-			<section className="relative flex min-h-[calc(100svh-260px)] flex-col px-5 py-5 sm:px-8 lg:min-h-[100svh] lg:px-12 lg:py-8 xl:px-20">
-				<div className="flex flex-1 items-center justify-center py-8 sm:py-12">
-					<div className="w-full max-w-[450px] login-entrance">
-						<div className="mb-7">
-							<h2 className="text-4xl font-black tracking-[-0.04em] sm:text-5xl">
-								SIGN IN
-							</h2>
-							<p className="mt-3 max-w-[390px] font-mono text-[10px] leading-5 tracking-[0.14em] text-muted-foreground sm:text-[11px]">
-								ENTER YOUR CREDENTIALS TO ACCESS THE DISPATCH CONSOLE.
-							</p>
-						</div>
-						<Card
-							className={`rounded-md border-border bg-card shadow-none ${apiError ? "login-card-shake" : ""}`}
-						>
-							<CardContent className="p-5 sm:p-7">
-								{apiError ? <Alert className="mb-6">{apiError}</Alert> : null}
-								<form
-									className="space-y-5"
-									onSubmit={handleSubmit(onSubmit)}
-									noValidate
-								>
-									<div className="space-y-2">
-										<Label
-											htmlFor="email"
-											className="font-mono text-[10px] tracking-[0.16em]"
-										>
-											EMAIL ADDRESS
-										</Label>
-										<div className="relative">
-											<EnvelopeSimple
-												aria-hidden="true"
-												size={18}
-												className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-											/>
-											<Input
-												id="email"
-												type="email"
-												inputMode="email"
-												autoFocus
-												autoComplete="email"
-												aria-invalid={!!errors.email}
-												aria-describedby={
-													errors.email ? "email-error" : undefined
-												}
-												className="min-h-11 rounded-sm pl-10 font-mono text-sm"
-												{...register("email")}
-											/>
-										</div>
-										{errors.email ? (
-											<p
-												id="email-error"
-												className="font-mono text-xs text-destructive"
-											>
-												{errors.email.message}
-											</p>
-										) : null}
-									</div>
-									<div className="space-y-2">
-										<Label
-											htmlFor="password"
-											className="flex items-center justify-between font-mono text-[10px] tracking-[0.16em]"
-										>
-											<span>PASSWORD</span>
-											<Link
-												to="/forgot-password"
-												className="text-[10px] tracking-[0.1em] text-accent hover:underline"
-											>
-												FORGOT PASSWORD?
-											</Link>
-										</Label>
-										<div className="relative">
-											<LockKey
-												aria-hidden="true"
-												size={18}
-												className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-											/>
-											<Input
-												id="password"
-												type={passwordInputType(showPassword)}
-												autoComplete="current-password"
-												aria-invalid={!!errors.password}
-												aria-describedby={
-													errors.password ? "password-error" : undefined
-												}
-												className="min-h-11 rounded-sm px-10 font-mono text-sm"
-												{...register("password")}
-											/>
-											<button
-												type="button"
-												aria-label={
-													showPassword ? "Hide password" : "Show password"
-												}
-												aria-pressed={showPassword}
-												className="absolute right-1 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-												onMouseDown={(event) => event.preventDefault()}
-												onClick={() => setShowPassword((value) => !value)}
-											>
-												{showPassword ? (
-													<EyeSlash size={18} />
-												) : (
-													<Eye size={18} />
-												)}
-											</button>
-										</div>
-										{errors.password ? (
-											<p
-												id="password-error"
-												className="font-mono text-xs text-destructive"
-											>
-												{errors.password.message}
-											</p>
-										) : null}
-									</div>
-									<label className="flex min-h-11 cursor-pointer items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-muted-foreground">
-										<Checkbox {...register("rememberMe")} />
-										REMEMBER ME
-									</label>
-									<Button
-										type="submit"
-										className="min-h-11 w-full rounded-sm font-mono text-xs tracking-[0.14em]"
-										disabled={submitting || success}
-									>
-										{submitting ? (
-											<>
-												<SpinnerGap className="animate-spin" size={17} />{" "}
-												SIGNING IN...
-											</>
-										) : success ? (
-											"ACCESS GRANTED"
-										) : (
-											<>
-												ACCESS CONSOLE <ArrowRight size={17} />
-											</>
-										)}
-									</Button>
-								</form>
-								<div className="my-6 flex items-center gap-3 font-mono text-[9px] tracking-[0.14em] text-muted-foreground">
-									<span className="h-px flex-1 bg-border" />
-									<span>OR CONTINUE WITH</span>
-									<span className="h-px flex-1 bg-border" />
-								</div>
-								<Button
-									variant="outline"
-									className="min-h-11 w-full rounded-sm font-mono text-xs tracking-[0.1em]"
-									disabled={!googleChecked || submitting}
-									onClick={() => void signInWithGoogle()}
-								>
-									<svg
-										aria-hidden="true"
-										viewBox="0 0 24 24"
-										className="size-4"
-									>
-										<path
-											fill="#4285F4"
-											d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.69 2.91-4.18 2.91-7.25Z"
-										/>
-										<path
-											fill="#34A853"
-											d="M12 21.5c2.63 0 4.84-.87 6.45-2.35l-3.14-2.44c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.52A9.74 9.74 0 0 0 12 21.5Z"
-										/>
-										<path
-											fill="#FBBC05"
-											d="M6.54 13.6A5.85 5.85 0 0 1 6.23 12c0-.56.11-1.1.31-1.6V7.88H3.3A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.12l3.24-2.52Z"
-										/>
-										<path
-											fill="#EA4335"
-											d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.48 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.38l3.24 2.52C7.31 8.1 9.46 6.38 12 6.38Z"
-										/>
-									</svg>
-									{googleChecked && !googleEnabled
-										? "GOOGLE SIGN-IN IS NOT CONFIGURED"
-										: "CONTINUE WITH GOOGLE"}
-								</Button>
-								<p className="mt-6 border-t border-border pt-5 text-center font-mono text-[10px] tracking-[0.12em] text-muted-foreground">
-									NEED AN ACCOUNT? ASK YOUR MANAGER.
-								</p>
-							</CardContent>
-						</Card>
+		<main className="login-page grid min-h-[100svh] bg-background text-foreground md:grid-cols-[52fr_48fr] lg:grid-cols-[58fr_42fr]">
+			<section className="dispatch-operations-panel hidden min-h-[100svh] items-center justify-center border-r border-border px-5 py-10 md:flex lg:px-8 xl:px-16">
+				<DispatchOperationsVisual />
+			</section>
+			<section className="login-form-panel flex min-h-[100svh] w-full items-center justify-center px-5 py-10 sm:px-8">
+				<div className="w-full max-w-[400px]">
+					<div
+						className="mb-9 flex items-center gap-3"
+						aria-label="DispatchPilot"
+					>
+						<span className="flex size-8 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
+							D
+						</span>
+						<span className="text-[15px] font-semibold tracking-[-0.02em]">
+							DispatchPilot
+						</span>
 					</div>
+
+					<div className="mb-8">
+						<h1 className="text-[30px] font-semibold leading-tight tracking-[-0.035em]">
+							Welcome back
+						</h1>
+						<p className="mt-2 text-sm text-muted-foreground">
+							Sign in to your DispatchPilot workspace.
+						</p>
+					</div>
+
+					{apiError ? (
+						<Alert role="alert" className="mb-6 text-sm">
+							{apiError}
+						</Alert>
+					) : null}
+
+					<form
+						className="space-y-5"
+						onSubmit={handleSubmit(onSubmit)}
+						noValidate
+					>
+						<div className="space-y-2">
+							<Label htmlFor="email" className="text-sm font-medium">
+								Email address
+							</Label>
+							<Input
+								id="email"
+								type="email"
+								inputMode="email"
+								autoFocus
+								autoComplete="email"
+								aria-invalid={!!errors.email}
+								aria-describedby={errors.email ? "email-error" : undefined}
+								className="h-11 !rounded-md bg-surface px-3 text-sm"
+								{...register("email")}
+							/>
+							{errors.email ? (
+								<p id="email-error" className="text-sm text-destructive">
+									{errors.email.message}
+								</p>
+							) : null}
+						</div>
+
+						<div className="space-y-2">
+							<div className="flex items-center justify-between gap-4">
+								<Label htmlFor="password" className="text-sm font-medium">
+									Password
+								</Label>
+								<Link
+									to="/forgot-password"
+									className="text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+								>
+									Forgot password?
+								</Link>
+							</div>
+							<div className="relative">
+								<Input
+									id="password"
+									type={passwordInputType(showPassword)}
+									autoComplete="current-password"
+									aria-invalid={!!errors.password}
+									aria-describedby={
+										errors.password ? "password-error" : undefined
+									}
+									className="h-11 !rounded-md bg-surface px-3 pr-11 text-sm"
+									{...register("password")}
+								/>
+								<button
+									type="button"
+									aria-label={showPassword ? "Hide password" : "Show password"}
+									aria-pressed={showPassword}
+									className="absolute right-1 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+									onMouseDown={(event) => event.preventDefault()}
+									onClick={() => setShowPassword((value) => !value)}
+								>
+									{showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+								</button>
+							</div>
+							{errors.password ? (
+								<p id="password-error" className="text-sm text-destructive">
+									{errors.password.message}
+								</p>
+							) : null}
+						</div>
+
+						<Button
+							type="submit"
+							className="h-11 w-full !rounded-md text-sm font-medium hover:bg-primary-hover"
+							disabled={submitting || success}
+						>
+							{submitting ? (
+								<>
+									<SpinnerGap className="animate-spin" size={17} /> Signing in…
+								</>
+							) : success ? (
+								"Signed in"
+							) : (
+								"Sign in"
+							)}
+						</Button>
+					</form>
+
+					<div className="my-7 flex items-center gap-3 text-xs text-muted-foreground">
+						<span className="h-px flex-1 bg-border" />
+						<span>or</span>
+						<span className="h-px flex-1 bg-border" />
+					</div>
+
+					<Button
+						variant="outline"
+						className="h-11 w-full !rounded-md bg-surface text-sm font-medium text-foreground hover:bg-muted"
+						disabled={submitting}
+						onClick={() => void signInWithGoogle()}
+					>
+						<svg aria-hidden="true" viewBox="0 0 24 24" className="size-4">
+							<path
+								fill="#4285F4"
+								d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.96h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.69 2.91-4.18 2.91-7.25Z"
+							/>
+							<path
+								fill="#34A853"
+								d="M12 21.5c2.63 0 4.84-.87 6.45-2.35l-3.14-2.44c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.52A9.74 9.74 0 0 0 12 21.5Z"
+							/>
+							<path
+								fill="#FBBC05"
+								d="M6.54 13.6A5.85 5.85 0 0 1 6.23 12c0-.56.11-1.1.31-1.6V7.88H3.3A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.05 4.12l3.24-2.52Z"
+							/>
+							<path
+								fill="#EA4335"
+								d="M12 6.38c1.43 0 2.71.49 3.72 1.46l2.79-2.79C16.84 3.48 14.63 2.5 12 2.5a9.74 9.74 0 0 0-8.7 5.38l3.24 2.52C7.31 8.1 9.46 6.38 12 6.38Z"
+							/>
+						</svg>
+						Sign in with Google
+					</Button>
 				</div>
-				<p className="text-center font-mono text-[10px] tracking-[0.1em] text-muted-foreground">
-					DISPATCHPILOT · 2026
-				</p>
 			</section>
 		</main>
 	);
