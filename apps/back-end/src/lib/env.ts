@@ -26,7 +26,7 @@ export const envSchema = z.object({
 		z.boolean().default(true),
 	),
 	GEMINI_API_KEY: z.string().trim().min(1).optional(),
-	GEMINI_MODEL: z.string().trim().default("gemini-2.0-flash"),
+	GEMINI_MODEL: z.string().trim().default("gemini-3.8-flash"),
 	GEMINI_TIMEOUT_MS: z.coerce.number().int().positive().max(30_000).default(8_000),
 	GEMINI_CALL_BUDGET: z.coerce.number().int().positive().default(3),
 	SCHEDULER_SECRET: z.string().optional(),
