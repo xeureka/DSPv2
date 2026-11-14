@@ -1,0 +1,10 @@
+import { runSimulation, type SimulationScenario } from "../packages/engine/src/sim.ts";
+const args = process.argv.slice(2);
+const value = (name: string, fallback: string) => { const index = args.indexOf(`--${name}`); return index >= 0 ? args[index + 1] ?? fallback : fallback; };
+if ((args[0] ?? "run") !== "run") throw new Error("Usage: sim run --days 100 --seed 42 --scenario normal");
+const days = Math.max(1, Math.min(100, Number(value("days", "100"))));
+const seed = Number(value("seed", "42"));
+const requested = value("scenario", "normal");
+const scenarios = requested === "all" ? ["normal", "heat wave", "sick leave"] : [requested];
+console.log("simulated=true; seeded benchmark; results are not production measurements");
+console.table(scenarios.map((scenario) => runSimulation({ days, seed, scenario: scenario as SimulationScenario })));

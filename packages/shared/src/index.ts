@@ -164,7 +164,7 @@ export const jobDraftSchema = z.object({
 	requester: z.string().max(255).default("Unknown requester"),
 	confidence: z.number().min(0).max(1),
 	evidenceSpans: z.array(evidenceSpanSchema).max(20).default([]),
-});
+}).strict();
 export type JobDraft = z.infer<typeof jobDraftSchema>;
 
 export const intakeMessageSchema = z.object({
@@ -190,3 +190,16 @@ export const commandIntentSchema = z.discriminatedUnion("intent", [
 	z.object({ intent: z.literal("show_job"), jobId: z.string().uuid() }),
 ]);
 export type CommandIntent = z.infer<typeof commandIntentSchema>;
+
+export const ruleDraftSchema = z.object({
+	tier: z.enum(["gold", "silver", "bronze"]),
+	responseMinutes: z.number().int().positive(),
+	resolutionMinutes: z.number().int().positive(),
+	callbackCap: z.number().int().positive().nullable(),
+	creditTerms: z.string().max(1_000).nullable(),
+	unclear: z.boolean(),
+	evidence: z.string().max(500),
+}).strict();
+export const contractRulesDraftSchema = z.object({ rules: z.array(ruleDraftSchema).min(1).max(10) }).strict();
+export type RuleDraft = z.infer<typeof ruleDraftSchema>;
+export type ContractRulesDraft = z.infer<typeof contractRulesDraftSchema>;

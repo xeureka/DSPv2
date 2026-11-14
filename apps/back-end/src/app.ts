@@ -45,7 +45,7 @@ app.use(
 	}),
 );
 
-app.use("*", bodyLimit({ maxSize: 5 * 1024 * 1024 }));
+app.use("*", bodyLimit({ maxSize: 12 * 1024 * 1024 }));
 
 app.use("*", requestId());
 

@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { jobDraftSchema, type JobDraft } from "@dspv2/shared";
+import { parseRuleBasedContract, parseRuleBasedJob } from "@/adapters/rule-parser";
 import { z, type ZodType } from "zod";
 import { env } from "@/lib/env";
 
@@ -37,17 +37,8 @@ export class GeminiLlmAdapter implements LlmAdapter {
 	}
 }
 
-export function parseRuleBasedJob(text: string): JobDraft {
-	const lower = text.toLowerCase();
-	const equipment = lower.includes("lift") || lower.includes("elevator") ? "elevator" : lower.includes("chiller") ? "chiller" : lower.includes("fridge") || lower.includes("freezer") || lower.includes("cold room") ? "refrigeration" : lower.includes("split") || lower.includes("air condition") || lower.includes("ac ") ? "split unit" : "split unit";
-	const safety = /trapped|stuck in (a )?(lift|elevator)|entrapment|smoke|fire|gas leak|flooding|injur(y|ed)/i.test(text);
-	const urgency = safety ? "emergency" : /urgent|asap|immediately|critical/i.test(text) ? "high" : "normal";
-	const location = text.match(/(?:at|in|on)\s+([^.!?]{3,120})/i)?.[1]?.trim() ?? "";
-	return jobDraftSchema.parse({ equipment, skill: equipment, urgency, locationText: location, requester: "Unknown requester", confidence: 0.42, evidenceSpans: [] });
-}
-
 export class FallbackLlmAdapter implements LlmAdapter {
-	async generateStructured<T>(request: StructuredRequest<T>) { return { value: request.schema.parse(parseRuleBasedJob(request.input)), model: "rule-based-fallback", latencyMs: 0, cached: false }; }
+	async generateStructured<T>(request: StructuredRequest<T>) { const raw = request.promptVersion === "b4-extract-contract-rules-v1" ? parseRuleBasedContract(request.input) : parseRuleBasedJob(request.input); return { value: request.schema.parse(raw), model: "rule-based-fallback", latencyMs: 0, cached: false }; }
 }
 export class ResilientLlmAdapter implements LlmAdapter {
 	constructor(private readonly primary: LlmAdapter, private readonly fallback: LlmAdapter = new FallbackLlmAdapter()) {}
