@@ -16,7 +16,8 @@
 		"eval": "pnpm --filter @dspv2/backend exec tsx ../../eval/run.ts",
 		"sim": "pnpm --filter @dspv2/engine exec tsx ../../sim/cli.ts",
 		"cloudflare:build": "pnpm --filter @dspv2/frontend build",
-		"cloudflare:deploy": "pnpm cloudflare:build && pnpm dlx wrangler@latest pages deploy apps/front-end/dist --project-name dispatchpilot-web --config wrangler.pages.jsonc",
+		"deploy:frontend": "pnpm --filter @dspv2/frontend run deploy",
+		"cloudflare:deploy": "pnpm run deploy:frontend",
 		"cloudflare:api:deploy": "pnpm dlx wrangler@latest deploy --config wrangler.worker.jsonc"
 	},
 	"engines": {

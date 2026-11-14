@@ -4,5 +4,6 @@ packages:
 allowBuilds:
   "@scarf/scarf": false
   esbuild: false
+  workerd: true
 minimumReleaseAgeExclude:
   - "@tanstack/query-core@5.102.5"
