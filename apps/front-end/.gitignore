@@ -13,9 +13,6 @@ dist-ssr
 *.local
 dev-credentials.json
 
-# TanStack Router generated route tree
-src/routeTree.gen.ts
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
