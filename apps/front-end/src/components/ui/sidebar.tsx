@@ -71,9 +71,8 @@ export function Sidebar({ children }: { children: ReactNode }) {
 	const { collapsed } = useSidebar();
 	return (
 		<aside
-			style={{ position: "relative" }}
 			data-state={collapsed ? "collapsed" : "expanded"}
-			className={`hidden h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex ${collapsed ? "w-16" : "w-64"}`}
+			className={`hidden h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex ${collapsed ? "w-[68px]" : "w-[240px]"}`}
 		>
 			{children}
 		</aside>
@@ -86,7 +85,7 @@ export function SidebarRail() {
 		<button
 			type="button"
 			aria-label="Toggle sidebar"
-			className="absolute inset-y-0 -right-1 z-20 hidden w-2 cursor-ew-resize md:block"
+			className="hidden"
 			onClick={toggleCollapsed}
 		/>
 	);
@@ -132,17 +131,23 @@ export function SidebarHeader({
 }) {
 	return (
 		<div
-			className={`flex min-h-14 items-center justify-between px-3 ${className}`}
+			className={`flex min-h-14 shrink-0 items-center justify-between px-3 ${className}`}
 		>
 			{children}
 		</div>
 	);
 }
 export function SidebarContent({ children }: { children: ReactNode }) {
-	return <div className="flex-1 overflow-y-auto px-3 py-4">{children}</div>;
+	return (
+		<div className="min-h-0 flex-1 overflow-y-auto px-2 py-4">{children}</div>
+	);
 }
 export function SidebarFooter({ children }: { children: ReactNode }) {
-	return <div className="mt-auto px-3 pb-4">{children}</div>;
+	return (
+		<div className="shrink-0 border-t border-sidebar-border px-2 py-3">
+			{children}
+		</div>
+	);
 }
 export function SidebarSeparator() {
 	return <Separator className="my-3 bg-sidebar-border" />;

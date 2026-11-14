@@ -1,0 +1,3 @@
+export type SlaRule = { tier: "gold" | "silver" | "bronze"; responseMinutes: number; resolutionTarget: number; callbackCap?: number; creditTerms?: string };
+export function slaDue(requestedAt: Date | number, rule: SlaRule) { return new Date(new Date(requestedAt).getTime() + rule.responseMinutes * 60_000); }
+export function escalationLevel(requestedAt: Date | number, now: Date | number, rule: SlaRule, safetyCritical = false) { const elapsed = new Date(now).getTime() - new Date(requestedAt).getTime(); const ratio = elapsed / (rule.responseMinutes * 60_000); const thresholds = safetyCritical ? [0.25, 0.5, 0.75] : [0.5, 0.75, 0.9]; return thresholds.reduce((level, threshold, index) => ratio >= threshold ? index + 1 : level, 0); }
