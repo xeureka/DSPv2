@@ -1,112 +1,207 @@
-# DispatchPilot
+# dispatchpilot
 
-DispatchPilot is a single-company field-service operations platform. Managers,
-dispatchers, and technicians will use it to coordinate service work. This
-branch contains the backend foundation and Phase B1 core APIs: authentication,
-roles, API conventions, logging, OpenAPI, tracked database migrations, seeded
-domain data, and the first real-data operational endpoints. The frontend remains
-on its documented mock adapter until each feature is swapped to the real API.
+**Open-source field-service operations platform for intelligent dispatching**
 
-## Stack
+A platform that helps facilities teams receive service requests, extract structured jobs from messy messages, enforce safety and SLA rules, plan technician routes, and review every automated decision. It connects managers, dispatchers, technicians, contracts, and operational evidence through a shared web application and API.
 
-- React 19, Vite, TanStack Router and Query, shadcn/ui, Phosphor Icons
-- Hono on Node.js 24, Better Auth, Drizzle ORM, PostgreSQL/Neon
-- Zod schemas in `packages/shared`
-- Google Cloud Run target; pnpm 11.23.0
+*Built for accountable service operations.*
 
-## Prerequisites
+---
 
-- Node.js 24.x
-- pnpm 11.23.0
-- PostgreSQL for backend runtime and tests
+## Key Features
 
-## Setup
+- Defended **message and contract intake** with Gemini structured extraction, Zod validation, deterministic safety scanning, and a rule-based fallback
+- Deterministic **planning and re-planning** with skills, shifts, SLA deadlines, travel, overtime, balance, and disruption costs
+- **Human approval workflows** for emergencies, low-confidence extraction, contract activation, and plan proposals
+- Contract-driven **SLA timers, escalation ladders, evidence packs, and dry-run notifications** through an idempotent outbox
+- **Event-sourced operational history** for jobs, assignments, approvals, plans, technician updates, and outbound messages
+- **Seeded simulator and benchmark** comparing the planner with a nearest-technician baseline
+- **Asset health and duration learning** from closed jobs and callbacks
+- Role-based web dashboard for managers, dispatchers, and technicians with live API data and SSE updates
 
-```bash
+## Architecture
+
+![DispatchPilot architecture](architecture.svg)
+
+The platform has four layers:
+
+1. **Experience** — The React/Vite dashboard uses TanStack Router and Query, shadcn/ui, Phosphor Icons, and Better Auth. Managers and dispatchers see the operational board, jobs, plan review, contracts, assets, simulator, approvals, and activity; technicians see their assigned work.
+2. **Application** — The Hono API on Node.js 24 owns authentication, role enforcement, intake, job workflow, contract approval, planning proposals, SLA ticks, simulations, evidence, outbox processing, and the authenticated SSE stream.
+3. **Decision engines** — `packages/engine` contains pure deterministic planner, SLA, and simulation logic. Gemini performs language tasks only; application code validates its typed output and makes all safety, assignment, timing, and approval decisions.
+4. **Persistence and adapters** — PostgreSQL/Neon stores domain state, append-only events, approvals, assignments, outbox rows, duration statistics, asset events, and simulation runs. Adapter boundaries provide Gemini/fallback parsing, haversine travel, geocoding, and dry-run mail.
+
+Inbound messages are sanitized and wrapped as untrusted data before deterministic safety triage and typed extraction. Safety hits cannot be removed by the model. Every state change writes an event, and every outbound message goes through the outbox.
+
+## Workspace Overview
+
+```
+dispatchpilot
+├── apps/back-end          # Hono API, Better Auth, Drizzle schema and services
+├── apps/front-end         # React/Vite dashboard and live API data layer
+├── packages/shared        # Shared Zod schemas, roles, and API types
+├── packages/engine        # Pure planner, SLA, and simulator engines
+├── eval                   # Labelled extraction and prompt-injection fixtures
+├── sim                    # Seeded benchmark CLI
+├── docs                   # PRD, SRS, API reference, and implementation plan
+├── Dockerfile             # Node 24 backend container
+└── architecture.svg       # System architecture diagram
+```
+
+---
+
+## Packages and Services
+
+### [`apps/back-end`](apps/back-end)
+
+The central API and domain service.
+
+- Better Auth cookie sessions with exactly three staff roles: manager, dispatcher, and technician
+- Hono routes under `/api/v1`, shared response envelopes, Zod boundary validation, and Scalar/OpenAPI documentation
+- Intake endpoints for messages and commands, including Gemini/fallback extraction, safety precedence, idempotency, and approval routing
+- Job, technician, contract, asset, plan proposal, simulation, evidence, internal tick, and event-stream endpoints
+- Drizzle ORM with tracked migrations and an idempotent development seed
+- Private contract PDF storage, manager-only activation, dry-run mail, scheduler protection, and structured logging
+
+See [`docs/API.md`](docs/API.md) and the live Scalar docs at `http://localhost:3001/docs`.
+
+---
+
+### [`apps/front-end`](apps/front-end)
+
+React single-page application for dispatch operations.
+
+- TanStack Router for file-based routes and TanStack Query for server state
+- Live API adapter selected with `VITE_USE_MOCK_DATA=false`
+- Dispatch board, jobs, plan review, contracts/SLA, assets, simulator, approvals/activity, settings, and technician views
+- SSE invalidation with polling-compatible query hooks
+- Responsive shadcn/ui components with the DispatchPilot green status palette
+- Mock data remains available only through the typed `mocks` adapter for demos and offline UI work
+
+---
+
+### [`packages/shared`](packages/shared)
+
+Shared contracts consumed by the backend, frontend, and tests.
+
+- Strict Zod schemas for jobs, contracts, approvals, assignments, events, simulations, and API envelopes
+- Role, status, equipment, skill, urgency, and safety enums
+- Types used by both live and mock data-access adapters
+
+---
+
+### [`packages/engine`](packages/engine)
+
+Pure TypeScript decision engines with no database or network calls.
+
+- Cheapest-insertion construction followed by bounded relocate, swap, and 2-opt improvement
+- Hard constraints for skills, shifts, overlaps, and critical SLA reachability
+- Cost breakdowns for travel, SLA lateness, overtime, balance, and promised-job disruption
+- SLA deadlines, escalation thresholds, and credit exposure calculations
+- Seeded simulator with normal, heat-wave, and sick-leave scenarios
+
+The same input and seed produce the same plan and simulation result.
+
+---
+
+### [`eval`](eval)
+
+Evaluation fixtures and runner for the AI intake boundary.
+
+- Labelled messages covering typos, multiple equipment types, missing fields, urgency, and safety language
+- Prompt-injection cases covering overrides, role-play, hidden text, exfiltration requests, and fake system messages
+- CI-safe fallback evaluation plus recorded-fixture compatibility for Gemini
+- Reports field-level accuracy and injection invariance without requiring a live key
+
+---
+
+### [`sim`](sim)
+
+Seeded benchmark command-line interface.
+
+- Compares nearest-technician baseline and DispatchPilot planner policies
+- Reports simulated SLA hit rate, travel minutes, moved jobs, overtime, seed, scenario, and duration
+- Supports repeatable what-if roster experiments through the simulation engine
+
+---
+
+## Quick Start
+
+```sh
 pnpm install
 cp apps/back-end/.env.example apps/back-end/.env
 cp apps/front-end/.env.example apps/front-end/.env
-pnpm typecheck
-pnpm lint
-pnpm build
 ```
 
-Do not commit either `.env` file. Set `DATABASE_URL`, the Better Auth URLs, and
-a 32-character `BETTER_AUTH_SECRET` in the backend environment. Use a
-non-production development database for local tests and seeding. The frontend
-can use an empty `VITE_API_URL` during local development because Vite proxies
-`/api`.
+Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `WEB_APP_URL`, and `CORS_ORIGINS` in `apps/back-end/.env`. Add `GEMINI_API_KEY` only when live extraction is wanted; the rule-based fallback keeps local development and CI working without it. Never commit `.env` files or expose API keys in logs.
 
-The development seed reads these backend variables: `SEED_MANAGER_EMAIL`,
-`SEED_MANAGER_NAME`, `SEED_MANAGER_PASSWORD`, `SEED_DISPATCHER_EMAIL`,
-`SEED_DISPATCHER_NAME`, `SEED_DISPATCHER_PASSWORD`, `SEED_TECHNICIAN_EMAIL`,
-`SEED_TECHNICIAN_NAME`, and `SEED_TECHNICIAN_PASSWORD`. If the seed variables
-are omitted, the seed uses the default credentials documented below.
+Initialize a non-production database:
 
-Database changes are tracked in `apps/back-end/drizzle`. Run migrations and
-seeds only against the intended development database:
-
-```bash
+```sh
 pnpm --filter @dspv2/backend db:migrate
 pnpm --filter @dspv2/backend seed
 ```
 
-The seed creates exactly one Better Auth credential user for each of the three
-roles and is idempotent. By default, the accounts are
-`manager@dispatchpilot.local` / `DispatchPilotManager123!`,
-`dispatcher@dispatchpilot.local` / `DispatchPilotDispatcher123!`, and
-`technician@dispatchpilot.local` / `DispatchPilotTechnician123!`. It never
-changes an existing password. Never run it against production.
+Start the API and dashboard:
 
-The frontend currently uses deterministic demo data. Set
-`VITE_USE_MOCK_DATA=false` when wiring the future API adapter; until that
-adapter exists, the UI remains on the mock adapter. Demo mode is visibly marked
-in the authenticated top bar. The seeded role accounts are documented in the
-local, ignored `credentials.md` file.
-
-## Commands
-
-```bash
+```sh
 pnpm dev
-pnpm lint
+```
+
+| Service | Port | Description |
+|---------|------|-------------|
+| `apps/back-end` | 3001 | Hono API, auth, Scalar docs, and SSE stream |
+| `apps/front-end` | 5173 | Vite web dashboard |
+| PostgreSQL/Neon | configured by `DATABASE_URL` | Domain and event storage |
+
+Open `http://localhost:5173` for the dashboard and `http://localhost:3001/docs` for the API reference. The seed creates one development account for each staff role; credentials are documented in the local ignored `credentials.md` file.
+
+## Development
+
+The project uses Node.js 24 and pnpm 11.23.0:
+
+```sh
 pnpm typecheck
+pnpm lint
 pnpm test
 pnpm build
 pnpm format:check
 ```
 
-Backend API documentation is available at `/docs` (Scalar) and
-`/openapi.json`. Health endpoints are `/api/v1/health` and
-`/api/v1/ready`. The complete B1 route inventory and idempotency/event rules
-are in `docs/API.md`.
+Run the intake evaluation and seeded benchmark:
 
-## Layout
-
-```text
-apps/back-end/       Hono API, Better Auth, Drizzle schema and migrations
-apps/front-end/      React/Vite app, auth routes and UI foundation
-packages/shared/     Roles, Zod schemas and API error types
-docs/                PRD, implementation plan and SRS
+```sh
+pnpm eval
+pnpm sim run --days 100 --seed 42 --scenario all
 ```
 
-See [PRD](docs/PRD.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md),
-and [SRS v2](docs/DispatchPilot_SRS_REVISED.pdf) for planned product scope.
+Simulation output is labelled `simulated=true` and must be interpreted as seeded benchmark data, not production performance. The API can also run simulations and the dashboard reads those persisted results through the live adapter.
 
-## UI verification
+## API and Operations
 
-The dashboard and login layouts use the light green theme. Screenshot
-verification is not recorded in this environment: no browser or screenshot
-runner was available, and the referenced
-`docs/design/reference-dashboard.png` file was not present.
+- API reference: [`docs/API.md`](docs/API.md), `/docs`, and `/openapi.json`
+- Health: `/api/v1/health` and `/api/v1/ready`
+- Intake: `POST /api/v1/intake/messages` and `POST /api/v1/intake/command`
+- Plans: `/api/v1/plans/proposals` and approval/rejection endpoints
+- Scheduler: `POST /api/v1/internal/tick`, `/nightly`, and `/daily`
+- Live updates: authenticated `GET /api/v1/stream`
+- Evidence: `GET /api/v1/sla/compliance` and `GET /api/v1/sla/evidence-pack`
 
-### Google sign-in and password reset
+Outbound messages are dry-run by default. Contract rules remain drafts until a manager approves them. Re-plans remain proposals unless the auto-pilot setting is explicitly enabled.
 
-Google sign-in is optional. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
-in the backend environment to enable the existing-user-only provider. Register
-these redirect URIs in Google Cloud Console:
+## Roadmap
 
-- Local: `http://localhost:3001/api/auth/callback/google`
-- Production: `https://<your-cloud-run-service-domain>/api/auth/callback/google`
+The following integrations are intentionally left behind adapter boundaries or require environment-specific setup:
 
-The reset flow uses Better Auth. In development, or with `DRY_RUN=true`, the
-reset URL is logged by the backend adapter; no email provider is bundled yet.
+- **Production deployment** — Cloud Run, Neon, and Cloud Scheduler configuration
+- **Live email delivery** — Gmail or another provider after the dry-run outbox is approved
+- **OSRM routing** — richer road travel times and route geometry beyond the haversine fallback
+- **Calendar and weather integrations** — optional Google Calendar and weather surge signals
+- **Requester tracking links** — private customer-facing status pages
+
+The core workflow, fallback path, planner, approvals, evidence trail, simulator, and frontend API integration are implemented locally and covered by the repository checks.
+
+---
+
+## License
+
+No license file has been added to this repository yet. Add the project license before distributing it as an open-source package.
