@@ -36,6 +36,7 @@ import {
 } from "@/components/layout/page-blocks";
 import {
 	useApproveItem,
+	useApproveContract,
 	useApprovePlan,
 	useApprovals,
 	useContracts,
@@ -44,6 +45,7 @@ import {
 	useSimulations,
 	useTechnicians,
 	useUpdateJobStatus,
+	useRunSimulation,
 } from "@/data/hooks";
 import { mockNow } from "@/mocks/data";
 import { authClient } from "@/lib/auth-client";
@@ -576,6 +578,7 @@ export function ActivityPage() {
 
 export function ContractsPage() {
 	const { data, isLoading } = useContracts();
+	const approveContract = useApproveContract();
 	const session = authClient.useSession();
 	const viewOnly =
 		session.data?.user &&
@@ -640,6 +643,7 @@ export function ContractsPage() {
 										>
 											{contract.status}
 										</Badge>
+										{contract.status !== "Active" && !viewOnly ? <Button size="sm" variant="outline" onClick={() => approveContract.mutate(contract.id)}>Approve</Button> : null}
 									</TableCell>
 								</TableRow>
 							))}
@@ -715,6 +719,7 @@ export function AssetsPage() {
 
 export function SimulatorPage() {
 	const { data, isLoading } = useSimulations();
+	const runSimulation = useRunSimulation();
 	const [scenario, setScenario] = useState<
 		"normal" | "heat wave" | "sick leave"
 	>("normal");
@@ -733,9 +738,7 @@ export function SimulatorPage() {
 				actions={
 					<Button
 						disabled={viewOnly}
-						onClick={() =>
-							toast.success("Simulation complete: illustrative seed 42.")
-						}
+						onClick={() => runSimulation.mutate({ days: 100, seed: 42, scenario }, { onSuccess: () => toast.success("Simulation complete: seed 42."), onError: (error) => toast.error(error.message) })}
 					>
 						<Flask size={17} /> Run simulation
 					</Button>

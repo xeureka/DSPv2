@@ -7,7 +7,7 @@ const API_ORIGIN = RAW_API_URL.trim().replace(/\/+$/, "");
 /** API origin; empty means same-origin (web dev, where Vite proxies `/api`). */
 export const API_BASE_URL: string = API_ORIGIN;
 export const USE_MOCK_DATA =
-	(import.meta.env.VITE_USE_MOCK_DATA as string | undefined) !== "false";
+	(import.meta.env.VITE_USE_MOCK_DATA as string | undefined) === "true";
 
 /**
  * Absolute origin Better Auth posts to. When left empty Better Auth falls back
